@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.dy.store.user.mapper.UserMapper">
+
+	<!-- user 테이블 전체 컬럼 -->
+	<sql id="userColumns">
+		  id
+		, email
+		, nickname
+		, password
+		, birthday
+		, failed_count
+		, delete_yn
+		, created_date
+		, modified_date
+		, last_login_date
+	</sql>
+
+	<!-- 사용자 등록 -->
+	<insert id="insertUser" parameterType="UserDto">
+		INSERT INTO user (
+			<include refid="userColumns" />
+		) VALUES (
+			  #{id}
+			, #{email}
+			, #{nickname}
+			, #{password}
+			, #{birthday}
+			, 0
+			, 'N'
+			, NOW()
+			, NULL
+			, NULL
+		)
+	</insert>
+
+	<!-- 사용자 정보 조회 -->
+	<select id="selectUserDetail" parameterType="UserDto" resultType="UserDto">
+		SELECT
+			<include refid="userColumns" />
+		FROM
+			user
+		<where>
+			delete_yn = 'N'
+			<if test="@com.dy.store.common.util.MyBatisUtils@isEmpty( email ) == false">
+				AND email = #{email}
+			</if>
+			<if test="@com.dy.store.common.util.MyBatisUtils@isEmpty( nickname ) == false">
+				AND nickname = #{nickname}
+			</if>
+			<if test="@com.dy.store.common.util.MyBatisUtils@isEmpty( birthday ) == false">
+				AND birthday = #{birthday}
+			</if>
+		</where>
+     </select>
+
+     <!-- 사용자 정보 조회 -->
+	<select id="selectUserDetailByEmail" parameterType="string" resultType="UserDto">
+		SELECT
+			<include refid="userColumns" />
+		FROM
+			user
+		<where>
+			delete_yn = 'N'
+		AND
+			email = #{value}
+		</where>
+     </select>
+
+	<!-- 사용자 정보 수정 -->
+	<update id="updateUser" parameterType="UserDto">
+		UPDATE user
+		SET
+			modified_date = NOW()
+		<if test="@com.dy.store.common.util.MyBatisUtils@isEmpty( nickname ) == false">
+			, nickname = #{nickname}
+		</if>
+		<if test="@com.dy.store.common.util.MyBatisUtils@isEmpty( password ) == false">
+			, password = #{password}
+		</if>
+		<if test="@com.dy.store.common.util.MyBatisUtils@isEmpty( birthday ) == false">
+			, birthday = #{birthday}
+		</if>
+		WHERE
+			email = #{email}
+	</update>
+
+	<!-- 사용자 삭제 -->
+	<update id="deleteUser" parameterType="string">
+		UPDATE user
+		SET
+			delete_yn = 'Y'
+		WHERE
+			email = #{email}
+	</update>
+
+	<!-- 사용자 목록 조회 -->
+	<select id="selectUserList" resultType="UserDto">
+		SELECT
+			<include refid="userColumns" />
+		FROM
+			user
+		<where>
+			delete_yn = 'N'
+		</where>
+		ORDER BY
+			  id DESC
+			, created_date DESC
+	</select>
+
+	<!-- 전체 사용자 수 조회 -->
+	<select id="selectUserTotalCount" parameterType="UserDto" resultType="int">
+		SELECT
+			COUNT(*)
+		FROM
+			user
+		<where>
+			delete_yn = 'N'
+			<choose>
+				<when test="@com.dy.store.common.util.MyBatisUtils@isEmpty( email ) == false">
+					AND
+						email = #{email}
+				</when>
+				<when test="@com.dy.store.common.util.MyBatisUtils@isEmpty( nickname ) == false">
+					AND
+						nickname = #{nickname}
+				</when>
+				<when test="@com.dy.store.common.util.MyBatisUtils@isEmpty( email, nickname ) == false">
+					AND (
+						email = #{email}
+						OR nickname = #{nickname}
+					)
+				</when>
+			</choose>
+		</where>
+	</select>
+
+</mapper>
