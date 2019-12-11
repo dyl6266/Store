@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layout/user/basic">
+
+	<th:block layout:fragment="content">
+		<div id="container">
+			<div class="login_wrap">
+				<p class="page_title">로그인</p>
+				<div class="login">
+					<form th:action="@{/auth}" method="post" onsubmit="return authentication(this)">
+						<input type="text" name="email" id="email" class="input_box" th:value="${email}" placeholder="아이디" />
+						<input type="password" name="password" id="password" placeholder="비밀번호" class="input_box" />
+
+						<!--/* LoginFailureHandler에서 세션에 저장한 메시지 */-->
+						<div th:if="${not #strings.isEmpty( message )}">
+							<p th:text="${message}"></p><br />
+						</div>
+
+						<div class="btn_wrap">
+							<input type="submit" class="btn btn_black" value="로그인" />
+							<a th:href="@{/signup}" class="btn btn_border_black">회원가입</a>
+						</div>
+
+						<div class="find_wrap">
+							<a th:href="@{/user/find-username}">아이디 찾기</a>
+							<a th:href="@{/user/find-password}">비밀번호 찾기</a>
+						</div>
+					</form>
+				</div>
+				<!--/* //.login */-->
+			</div>
+			<!--/* //.login_wrap */-->
+		</div>
+		<!--/* //.container */-->
+	</th:block>
+
+	<th:block layout:fragment="script">
+		<script th:inline="javascript">
+		/* <![CDATA[ */
+
+			/**
+			 * 로그인 인증
+			 */
+			function authentication(form) {
+				return (isValid(form.email, "아이디", null) && isValid(form.password, "비밀번호", null));
+			}
+			/*[- end of function -]*/
+
+		/* ]]> */
+		</script>
+	</th:block>
+
+</html>
