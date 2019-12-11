@@ -62,9 +62,10 @@
 			delete_yn AS status
 		FROM
 			authentication
-		<where>
+		WHERE
 			email = #{email}
-		</where>
+		ORDER BY id DESC
+		LIMIT 1
      </select>
 
 </mapper>

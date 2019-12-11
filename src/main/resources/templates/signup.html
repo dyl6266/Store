@@ -195,6 +195,9 @@
 				/*[- 닉네임 패턴 체크 정규식 -]*/
 				var regexp = /^[가-힣]{2,10}$/i;
 				if (regexp.test(nickname.value) == false) {
+					/*[- 닉네임 중복 확인 미완료 처리 -]*/
+					obj.form.isNicknameChecked.value = "N";
+
 					/*[- span 엘러먼트 존재 여부에 따라 추가 또는 덮어쓰기 처리 -]*/
 					message = "닉네임을 올바른 형식으로 입력해 주세요.";
 					nickname.focus();
@@ -206,10 +209,10 @@
 				/*[- span 엘러먼트 제거 -]*/
 				$(".msg").remove();
 
-				var uri = /*[[ @{/users} ]]*/;
-				var params = { "nickname" : nickname.value };
+				var uri = /*[[ @{/users/} ]]*/;
+				uri += nickname.value;
 
-				$.get(uri, params, function(response) {
+				$.get(uri, function(response) {
 					/*[- span 엘러먼트 존재 여부에 따라 추가 또는 덮어쓰기 처리 -]*/
 					message = (isEmpty(response.user) == true) ? "사용할 수 있는 닉네임입니다." : "이미 사용 중인 닉네임입니다.";
 					span = '<span class="msg">' + message + '</span>';

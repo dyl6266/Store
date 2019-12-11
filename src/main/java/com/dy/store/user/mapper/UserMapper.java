@@ -28,10 +28,10 @@ public interface UserMapper {
 	/**
 	 * 사용자 정보 조회
 	 * 
-	 * @param email - 아이디
+	 * @param param - 아이디 또는 닉네임
 	 * @return 사용자 정보
 	 */
-	public UserDto selectUserDetailByEmail(String email);
+	public UserDto selectUserDetailByEmailOrNickname(String param);
 
 	/**
 	 * 사용자 정보 수정

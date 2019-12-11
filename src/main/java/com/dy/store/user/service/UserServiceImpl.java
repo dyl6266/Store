@@ -93,6 +93,17 @@ public class UserServiceImpl implements UserService {
 	}
 
 	/**
+	 * 사용자 정보 조회
+	 * 
+	 * @param param - 아이디 또는 닉네임
+	 * @return 사용자 정보
+	 */
+	@Override
+	public UserDto getUserDetail(String param) {
+		return userMapper.selectUserDetailByEmailOrNickname(param);
+	}
+
+	/**
 	 * 데이터베이스에서 사용자의 정보를 직접 가지고 올 때 사용하는 시큐리티 메소드
 	 * 
 	 * @param email - 아이디
@@ -100,7 +111,7 @@ public class UserServiceImpl implements UserService {
 	 */
 	@Override
 	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-		return userMapper.selectUserDetailByEmail(email);
+		return userMapper.selectUserDetailByEmailOrNickname(email);
 	}
 
 	/**

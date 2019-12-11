@@ -56,7 +56,7 @@
      </select>
 
      <!-- 사용자 정보 조회 -->
-	<select id="selectUserDetailByEmail" parameterType="string" resultType="UserDto">
+	<select id="selectUserDetailByEmailOrNickname" parameterType="string" resultType="UserDto">
 		SELECT
 			<include refid="userColumns" />
 		FROM
@@ -64,7 +64,10 @@
 		<where>
 			delete_yn = 'N'
 		AND
-			email = #{value}
+			(
+				email = #{value}
+				OR nickname = #{value}
+			)
 		</where>
      </select>
 

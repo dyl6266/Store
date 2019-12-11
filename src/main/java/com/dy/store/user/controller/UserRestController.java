@@ -163,15 +163,15 @@ public class UserRestController {
 	/**
 	 * 회원정보 상세 조회
 	 * 
-	 * @param params - UserDto
+	 * @param param - 아이디 또는 닉네임
 	 * @return 메시지, 결과를 담은 Json
 	 */
-	@GetMapping(value = "/users")
-	public JsonObject getUserDetail(final UserDto params) {
+	@GetMapping(value = "/users/{param}")
+	public JsonObject getUserDetail(@PathVariable String param) {
 
 		JsonObject jsonObj = new JsonObject();
 
-		UserDto user = (UserDto) userService.getUserDetail(params);
+		UserDto user = (UserDto) userService.getUserDetail(param);
 		if (user != null) {
 			JsonElement jsonElem = new Gson().toJsonTree(user);
 			jsonObj.add("user", jsonElem);

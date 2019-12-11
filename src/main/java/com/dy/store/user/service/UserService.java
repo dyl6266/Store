@@ -26,6 +26,14 @@ public interface UserService extends UserDetailsService {
 	public UserDto getUserDetail(UserDto params);
 
 	/**
+	 * 사용자 정보 조회
+	 * 
+	 * @param param - 아이디 또는 닉네임
+	 * @return 사용자 정보
+	 */
+	public UserDto getUserDetail(String param);
+
+	/**
 	 * 사용자 삭제
 	 * 
 	 * @param email - 아이디
