@@ -136,4 +136,13 @@
 		</where>
 	</select>
 
+	<!-- 사용자 로그인 실패 수 변경 -->
+	<update id="updateUserLoginFailureCount" parameterType="UserDto">
+		UPDATE user
+		SET
+			failed_count = #{failedCount}
+		WHERE
+			email = #{email}
+	</update>
+
 </mapper>

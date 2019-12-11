@@ -13,7 +13,6 @@ public interface UserService extends UserDetailsService {
 	 * 사용자 등록 (Insert or Update)
 	 * 
 	 * @param params - UserDto
-	 * 
 	 * @return boolean
 	 */
 	public boolean registerUser(UserDto params);
@@ -22,8 +21,7 @@ public interface UserService extends UserDetailsService {
 	 * 사용자 정보 조회
 	 * 
 	 * @param params - UserDto
-	 * 
-	 * @return UserDto
+	 * @return 사용자 정보
 	 */
 	public UserDto getUserDetail(UserDto params);
 
@@ -31,7 +29,6 @@ public interface UserService extends UserDetailsService {
 	 * 사용자 삭제
 	 * 
 	 * @param email - 아이디
-	 * 
 	 * @return boolean
 	 */
 	public boolean deleteUser(String email);
@@ -42,5 +39,14 @@ public interface UserService extends UserDetailsService {
 	 * @return 사용자 목록
 	 */
 	public List<UserDto> getUserList();
+
+	/**
+	 * 로그인 실패 횟수 변경
+	 * 
+	 * @param email - 아이디
+	 * @param failedCount - 로그인 실패 수
+	 * @return boolean
+	 */
+	public boolean modifyUserLoginFailureCount(String email, int failedCount);
 
 }

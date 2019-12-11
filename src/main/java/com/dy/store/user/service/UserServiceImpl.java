@@ -30,7 +30,6 @@ public class UserServiceImpl implements UserService {
 	 * 사용자 등록 (Insert or Update)
 	 * 
 	 * @param params - UserDto
-	 * 
 	 * @return boolean
 	 */
 	@Override
@@ -65,7 +64,7 @@ public class UserServiceImpl implements UserService {
 				return false;
 			}
 
-		/* Update (파라미터에 PK가 존재하는 경우) */
+			/* Update (파라미터에 PK가 존재하는 경우) */
 		} else {
 			user = UserDto.builder().nickname(params.getNickname()).build();
 			userCount = userMapper.selectUserTotalCount(user);
@@ -86,8 +85,7 @@ public class UserServiceImpl implements UserService {
 	 * 사용자 정보 조회
 	 * 
 	 * @param params - UserDto
-	 * 
-	 * @return UserDto
+	 * @return 사용자 정보
 	 */
 	@Override
 	public UserDto getUserDetail(UserDto params) {
@@ -98,8 +96,7 @@ public class UserServiceImpl implements UserService {
 	 * 데이터베이스에서 사용자의 정보를 직접 가지고 올 때 사용하는 시큐리티 메소드
 	 * 
 	 * @param email - 아이디
-	 * 
-	 * @return UserDetails
+	 * @return 사용자 정보
 	 */
 	@Override
 	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
@@ -110,7 +107,6 @@ public class UserServiceImpl implements UserService {
 	 * 사용자 삭제
 	 * 
 	 * @param email - 아이디
-	 * 
 	 * @return boolean
 	 */
 	@Override
@@ -127,7 +123,7 @@ public class UserServiceImpl implements UserService {
 	/**
 	 * 사용자 목록 조회
 	 * 
-	 * @return UserDto
+	 * @return 사용자 목록
 	 */
 	@Override
 	public List<UserDto> getUserList() {
@@ -140,6 +136,26 @@ public class UserServiceImpl implements UserService {
 		}
 
 		return userList;
+	}
+
+	/**
+	 * 로그인 실패 횟수 변경
+	 * 
+	 * @param email - 아이디
+	 * @param failedCount - 로그인 실패 수
+	 * @return boolean
+	 */
+	@Override
+	public boolean modifyUserLoginFailureCount(String email, int failedCount) {
+
+		UserDto params = UserDto.builder().email(email).failedCount(failedCount).build();
+
+		int queryResult = userMapper.updateUserLoginFailureCount(params);
+		if (queryResult != 1) {
+			return false;
+		}
+
+		return true;
 	}
 
 }

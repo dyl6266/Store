@@ -67,12 +67,13 @@ public class UserDto extends CommonDto implements UserDetails {
 	private boolean enabled = true;
 
 	@Builder
-	public UserDto(Long id, String email, String nickname, String password, String birthday) {
+	public UserDto(Long id, String email, String nickname, String password, String birthday, int failedCount) {
 		this.id = id;
 		this.email = email;
 		this.nickname = nickname;
 		this.password = password;
 		this.birthday = birthday;
+		this.failedCount = failedCount;
 	}
 
 }

@@ -27,7 +27,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	 * 인증 메일 발송
 	 * 
 	 * @param email - 아이디
-	 * 
 	 * @return boolean
 	 */
 	public boolean sendAuthenticationMail(String email) {
@@ -76,8 +75,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	 * 
 	 * @param email - 아이디
 	 * @param number - 인증번호
-	 * 
-	 * @return AuthenticationDto
+	 * @return 인증 정보
 	 */
 	@Override
 	public AuthenticationDto getAuthenticationDetail(String email, String number) {
@@ -91,7 +89,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	 * 
 	 * @param email - 아이디
 	 * @param number - 인증번호
-	 * 
 	 * @return boolean
 	 */
 	@Override
