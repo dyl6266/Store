@@ -4,12 +4,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.dy.store.authentication.mapper.AuthenticationMapper;
+import com.dy.store.authority.mapper.AuthorityMapper;
 import com.dy.store.common.constant.YesNo;
 import com.dy.store.user.domain.UserDto;
 import com.dy.store.user.mapper.UserMapper;
@@ -22,7 +24,9 @@ public class UserServiceImpl implements UserService {
 
 	private UserMapper userMapper;
 
-	private AuthenticationMapper authMapper;
+	private AuthenticationMapper authenticationMapper;
+
+	private AuthorityMapper authorityMapper;
 
 	private PasswordEncoder passwordEncoder;
 
@@ -47,7 +51,7 @@ public class UserServiceImpl implements UserService {
 		/* Insert (파라미터에 PK가 존재하지 않는 경우) */
 		if (params.getId() == null) {
 			/* 인증번호 확인이 정상적으로 처리되었는지 확인 */
-			YesNo status = authMapper.selectAuthenticationStatus(params.getEmail());
+			YesNo status = authenticationMapper.selectAuthenticationStatus(params.getEmail());
 			if (status == YesNo.N) {
 				return false;
 			}
@@ -111,7 +115,20 @@ public class UserServiceImpl implements UserService {
 	 */
 	@Override
 	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-		return userMapper.selectUserDetailByEmailOrNickname(email);
+
+		UserDto user = userMapper.selectUserDetailByEmailOrNickname(email);
+		if (user != null) {
+			/* 사용자의 권한 목록을 담을 리스트 */
+			List<GrantedAuthority> authorities = Collections.emptyList();
+
+			int totalCount = authorityMapper.selectUserAuthorityTotalCount(email);
+			if (totalCount > 0) {
+				authorities = authorityMapper.selectUserAuthorityList(email);
+				user.setAuthorities(authorities);
+			}
+		}
+
+		return user;
 	}
 
 	/**

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.dy.store.authority.mapper.AuthorityMapper">
+
+	<!-- authority 테이블 전체 컬럼 -->
+	<sql id="authorityColumns">
+		  id
+		, email
+		, name
+		, delete_yn
+		, created_date
+		, modified_date
+	</sql>
+
+	<!-- 사용자 권한 등록 -->
+	<insert id="insertUserAuthority" parameterType="AuthorityDto">
+		INSERT INTO authority (
+			<include refid="authorityColumns" />
+		) VALUES (
+			#{id}
+			, #{email}
+			, #{name}
+			, 'N'
+			, NOW()
+			, NULL
+		)
+	</insert>
+
+	<!-- 사용자 권한 삭제 -->
+	<update id="deleteUserAuthority" parameterType="AuthorityDto">
+		UPDATE authority
+		SET
+			delete_yn = 'Y'
+		WHERE
+			email = #{email}
+		AND
+			name = #{name}
+	</update>
+
+	<!-- 사용자 권한 목록 조회 -->
+	<select id="selectUserAuthorityList" parameterType="string" resultType="org.springframework.security.core.authority.SimpleGrantedAuthority">
+		SELECT
+			CONCAT('ROLE_', name) AS name
+		FROM
+			authority
+		<where>
+			delete_yn = 'N'
+		AND
+			email = #{email}
+		</where>
+	</select>
+
+	<!-- 사용자 전체 권한 수 조회 -->
+	<select id="selectUserAuthorityTotalCount" parameterType="string" resultType="int">
+		SELECT
+			COUNT(*)
+		FROM
+			authority
+		<where>
+			delete_yn = 'N'
+		AND
+			email = #{email}
+		</where>
+	</select>
+
+</mapper>

@@ -26,7 +26,7 @@ public class UserDto extends CommonDto implements UserDetails {
 	/** PK */
 	private Long id;
 
-	/** 이메일 (UK) */
+	/** 아이디 (UK) */
 	@Pattern(message = "아이디를 올바른 형식으로 입력해 주세요.", regexp = "^[-A-Za-z0-9_]+[-A-Za-z0-9_.]*[@]{1}[-A-Za-z0-9_]+[-A-Za-z0-9_.]*[.]{1}[A-Za-z]{1,5}$")
 	private String email;
 
