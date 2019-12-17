@@ -1,8 +1,11 @@
 package com.dy.store.user.controller;
 
+import java.util.List;
+
 import javax.validation.Valid;
 
 import org.springframework.dao.DataAccessException;
+import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -16,6 +19,7 @@ import com.dy.store.authentication.service.AuthenticationService;
 import com.dy.store.user.domain.UserDto;
 import com.dy.store.user.service.UserService;
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
@@ -175,6 +179,26 @@ public class UserRestController {
 		if (user != null) {
 			JsonElement jsonElem = new Gson().toJsonTree(user);
 			jsonObj.add("user", jsonElem);
+		}
+
+		return jsonObj;
+	}
+
+	/**
+	 * 사용자 목록 조회
+	 * 
+	 * @return
+	 */
+	@GetMapping(value = "/users")
+	public JsonObject getUserList() {
+
+		JsonObject jsonObj = new JsonObject();
+
+		List<UserDto> userList = userService.getUserList();
+		if (CollectionUtils.isEmpty(userList) == false) {
+			JsonElement jsonElem = new Gson().toJsonTree(userList).getAsJsonArray();
+			JsonArray jsonArr = jsonElem.getAsJsonArray();
+			jsonObj.add("users", jsonArr);
 		}
 
 		return jsonObj;

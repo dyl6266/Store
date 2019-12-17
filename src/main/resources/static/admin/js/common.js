@@ -28,6 +28,7 @@ function charToUnicode(str) {
  * @param field1 - 타겟 필드1
  * @param field2 - 타겟 필드2
  * @param fieldName - 필드 이름
+ * 
  * @returns 메시지
  */
 function isEquals(field1, field2, fieldName) {
@@ -51,6 +52,7 @@ function isEquals(field1, field2, fieldName) {
  * @param field - 타겟 필드
  * @param fieldName - 필드 이름 (null 허용)
  * @param focusField - 포커스할 필드 (null 허용)
+ * 
  * @returns 메시지
  */
 function isValid(field, fieldName, focusField) {
@@ -80,20 +82,20 @@ function nvl(value1, value2) {
 /**
  * 입력받은 숫자에 콤마를 포함해 반환한다.
  * 
- * @param target
+ * @param obj
  * @returns 콤마가 붙은 숫자
  */
 function makeCommas(target) {
 	var regexp = /\B(?=(\d{3})+(?!\d))/g;
-	return target.toString().replace(regexp, ",");
+	target.value = target.value.replace(regexp, ',');
 }
 
 /**
  * Form에 존재하는 input, textarea를 포함한 모든 입력 필드의 name, value를 오브젝트에 key, value 형태로 담아서 반환
  * Ajax를 사용할 때, 파라미터를 하나씩 추가하지 않고, form을 인자로 넘겨서 사용
  * 
- * @param form - form 엘러먼트
- * @returns 오브젝트
+ * @param form - Form 객체
+ * @returns
  */
 function makeAjaxRequestData(form) {
 
@@ -101,7 +103,6 @@ function makeAjaxRequestData(form) {
 	var obj = new Object();
 	/* Form 데이터를 배열 형태로 serialize */
 	var datas = $(form).serializeArray();
-
 	/* 요소 개수만큼 params에 key, value 형태로 저장 */
 	$(datas).each(function(idx, elem) {
 		if (isEmpty(elem.value) == false) {
@@ -110,8 +111,28 @@ function makeAjaxRequestData(form) {
 	});
 
 	/* spring security csrf 토큰 제거 => header에 정보를 담아서 전송하기 때문에 문제가 되지 않음 */
-	delete obj._csrf;
+	obj._csrf = null;
 	return obj;
+}
+
+/**
+ * 파일의 확장자가 이미지 타입인지 확인
+ * 
+ * @param filename - 파일명
+ * @returns true OR false
+ */
+function isImageExtension(filename) {
+
+	if (isEmpty(filename)) {
+		return false;
+	}
+
+	var extension = filename.substring(filename.lastIndexOf(".") + 1, filename.length).toUpperCase();
+	if (extension != "JPEG" && extension != "JPG" && extension != "GIF" && extension != "PNG") {
+		return false;
+	}
+
+	return true;
 }
 
 /**

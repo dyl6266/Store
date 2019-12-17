@@ -108,8 +108,7 @@
 			delete_yn = 'N'
 		</where>
 		ORDER BY
-			  id DESC
-			, created_date DESC
+			  id DESC, created_date DESC
 	</select>
 
 	<!-- 전체 사용자 수 조회 -->

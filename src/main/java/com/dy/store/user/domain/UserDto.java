@@ -2,6 +2,7 @@ package com.dy.store.user.domain;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.List;
 
 import javax.validation.constraints.Pattern;
 
@@ -48,8 +49,11 @@ public class UserDto extends CommonDto implements UserDetails {
 	/** 마지막 로그인 날짜 */
 	private LocalDateTime lastLoginDate;
 
-	/** 권한 리스트 (Not a column) */
+	/** 권한 목록 (Not a column) */
 	private Collection<? extends GrantedAuthority> authorities;
+
+	/** 권한명 */
+	private List<String> authorityNames;
 
 	/** 아이디 (Not a column) */
 	private String username;

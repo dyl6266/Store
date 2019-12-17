@@ -1,5 +1,6 @@
 package com.dy.store.user.service;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -11,6 +12,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.dy.store.authentication.mapper.AuthenticationMapper;
+import com.dy.store.authority.constant.Authority;
+import com.dy.store.authority.domain.AuthorityDto;
 import com.dy.store.authority.mapper.AuthorityMapper;
 import com.dy.store.common.constant.YesNo;
 import com.dy.store.user.domain.UserDto;
@@ -64,6 +67,13 @@ public class UserServiceImpl implements UserService {
 			}
 
 			queryResult = userMapper.insertUser(params);
+			if (queryResult != 1) {
+				return false;
+			}
+
+			/* 권한 등록 */
+			AuthorityDto authority = AuthorityDto.builder().email(params.getEmail()).name(Authority.MEMBER).build();
+			queryResult = authorityMapper.insertUserAuthority(authority);
 			if (queryResult != 1) {
 				return false;
 			}
@@ -161,6 +171,27 @@ public class UserServiceImpl implements UserService {
 		int userTotalCount = userMapper.selectUserTotalCount(null);
 		if (userTotalCount > 0) {
 			userList = userMapper.selectUserList();
+
+			/* 사용자 권한 목록 저장 */
+			for (UserDto user : userList) {
+				List<GrantedAuthority> authorities = authorityMapper.selectUserAuthorityList(user.getEmail());
+				user.setAuthorities(authorities);
+
+				/* 권한명 저장 */
+				List<String> authorityNames = new ArrayList<>();
+				for (GrantedAuthority grantedAuthority : authorities) {
+					/* Authority의 모든 권한 상수 중 GrantedAuthority를 포함하는 문자열이 있는 경우 권한명 추가 (if 조건이 들어가지 않으면 모든 권한의 권한명이 추가됨) */
+					for (Authority authority : Authority.values()) {
+						if (String.valueOf(grantedAuthority).contains(String.valueOf(authority)) == true) {
+							authorityNames.add(authority.getValue());
+						}
+					}
+				}
+				// end of authorities forEach
+
+				user.setAuthorityNames(authorityNames);
+			}
+			// end of userList forEach
 		}
 
 		return userList;
