@@ -44,9 +44,10 @@ public interface UserService extends UserDetailsService {
 	/**
 	 * 사용자 목록 조회
 	 * 
+	 * @param params - UserDto
 	 * @return 사용자 목록
 	 */
-	public List<UserDto> getUserList();
+	public List<UserDto> getUserList(UserDto params);
 
 	/**
 	 * 로그인 실패 횟수 변경

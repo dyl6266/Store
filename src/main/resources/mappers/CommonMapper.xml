@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="CommonMapper">
+
+	<!-- MySQL 페이징 -->
+	<sql id="paging">
+		LIMIT
+			#{paginationInfo.firstRecordIndex}, #{recordCountPerPage}
+	</sql>
+
+	<!-- MySQL 검색 -->
+	<sql id="search">
+		<!-- 검색 키워드가 존재하지 않으면 쿼리 실행 X -->
+		<if test="@com.dy.store.common.util.MyBatisUtils@isEmpty( searchKeyword ) == false">
+			<choose>
+				<!-- 검색 유형이 존재할 때 -->
+				<when test="@com.dy.store.common.util.MyBatisUtils@isEmpty( searchType ) == false">
+					<!-- 검색 유형을 #{}으로 처리하면 따옴표가 붙게 되는데, ${}으로 처리하면 따옴표는 제거되지만, SQL Injection 공격을 받을 수 있음 -->
+					<choose>
+						<when test='searchType.name() == "EMAIL"'>
+							AND
+								EMAIL LIKE CONCAT('%', REPLACE(#{searchKeyword}, ' ', ''), '%')
+						</when>
+						<when test='searchType.name() == "NICKNAME"'>
+							AND
+								NICKNAME LIKE CONCAT('%', REPLACE(#{searchKeyword}, ' ', ''), '%')
+						</when>
+						<when test='searchType.name() == "BIRTHDAY"'>
+							AND
+								BIRTHDAY LIKE CONCAT('%', REPLACE(#{searchKeyword}, ' ', ''), '%')
+						</when>
+					</choose>
+				</when>
+				<!-- 검색 유형이 존재하지 않을 때 -->
+				<otherwise>
+					AND
+						(
+							   REPLACE(email, ' ', '') LIKE CONCAT('%', REPLACE(#{searchKeyword}, ' ', ''), '%')
+							OR REPLACE(nickname, ' ', '') LIKE CONCAT('%', REPLACE(#{searchKeyword}, ' ', ''), '%')
+							OR REPLACE(birthday, ' ', '') LIKE CONCAT('%', REPLACE(#{searchKeyword}, ' ', ''), '%')
+						)
+				</otherwise>
+			</choose>
+		</if>
+	</sql>
+
+</mapper>

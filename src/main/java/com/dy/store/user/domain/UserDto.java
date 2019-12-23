@@ -44,7 +44,7 @@ public class UserDto extends CommonDto implements UserDetails {
 	private String birthday;
 
 	/** 로그인 실패 횟수 */
-	private int failedCount;
+	private Integer failedCount;
 
 	/** 마지막 로그인 날짜 */
 	private LocalDateTime lastLoginDate;
@@ -52,7 +52,7 @@ public class UserDto extends CommonDto implements UserDetails {
 	/** 권한 목록 (Not a column) */
 	private Collection<? extends GrantedAuthority> authorities;
 
-	/** 권한명 */
+	/** 권한명 (Not a column) */
 	private List<String> authorityNames;
 
 	/** 아이디 (Not a column) */
@@ -71,7 +71,7 @@ public class UserDto extends CommonDto implements UserDetails {
 	private boolean enabled = true;
 
 	@Builder
-	public UserDto(Long id, String email, String nickname, String password, String birthday, int failedCount) {
+	public UserDto(Long id, String email, String nickname, String password, String birthday, Integer failedCount) {
 		this.id = id;
 		this.email = email;
 		this.nickname = nickname;

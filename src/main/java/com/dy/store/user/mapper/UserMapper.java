@@ -51,10 +51,11 @@ public interface UserMapper {
 
 	/**
 	 * 사용자 목록 조회
-	 * 
+	 *
+	 * @param params - UserDto
 	 * @return 사용자 목록
 	 */
-	public List<UserDto> selectUserList();
+	public List<UserDto> selectUserList(UserDto params);
 
 	/**
 	 * 전체 사용자 수 조회

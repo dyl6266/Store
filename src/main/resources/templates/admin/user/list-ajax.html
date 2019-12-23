@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+	<div class="page_route">
+		<a href="#" class="home" title="Home">Home</a>
+		<a href="#" title="회원 관리">회원 관리</a>
+		<a href="#" title="회원 목록">회원 목록</a>
+	</div>
+
+	<div class="inner">
+		<h1 class="page_title">회원 목록</h1>
+
+		<form th:action="@{/admin/user/list}" method="get" onsubmit="return searchUser(this)">
+			<div class="search_box text_center">
+				<dl>
+					<dt>검색 유형</dt>
+					<dd>
+						<select name="searchType">
+							<option value="">=======</option>
+							<option th:each="type : ${T(com.dy.store.common.paging.constant.SearchType.UserSearchType).values()}" th:value="${type}" th:text="${type.value}" th:selected="${type == params.searchType}"></option>
+						</select>
+					</dd>
+				</dl>
+				<dl>
+					<dt>키워드</dt>
+					<dd>
+						<input type="text" name="searchKeyword" class="wd150" th:value="${params.searchKeyword}" />
+						<input type="submit" class="btn btn_search" value="검색" />
+					</dd>
+				</dl>
+				<dl>
+					<dt>데이터 수</dt>
+					<dd>
+						<select name="recordCountPerPage" onchange="changeRecordCounrPerPage(this)">
+							<option value="8">기본</option>
+							<option th:each="seq : ${#numbers.sequence(5, 50, 5)}" th:value="${seq}" th:text="${seq}" th:selected="${seq == params.recordCountPerPage}"></option>
+						</select>
+					</dd>
+				</dl>
+			</div>
+			<!--/* .search_box */-->
+		</form>
+
+		<div class="board_list">
+			<table>
+				<caption></caption>
+				<colgroup>
+					<col style="width: 5%" />
+					<col style="*" />
+					<col style="width: 20%" />
+					<col style="width: 15%" />
+					<col style="width: 15%" />
+					<col style="width: 15%" />
+				</colgroup>
+				<thead>
+					<tr>
+						<th>번호</th>
+						<th>아이디</th>
+						<th>닉네임</th>
+						<th>권한</th>
+						<th>잠김</th>
+						<th>관리</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:if="${not #lists.isEmpty( users )}" th:each="row, status : ${users}">
+						<td th:text="${row.id}"></td>
+						<td th:text="${row.email}"></td>
+						<td th:text="${row.nickname}"></td>
+						<td>
+							<select name="authorities" th:with="authorities=${T(com.dy.store.authority.constant.Authority).values()}">
+								<option th:each="authority, status : ${row.authorities}" th:value="${#strings.replace(authority, 'ROLE_', '')}" th:text="${row.authorityNames[status.index]}"></option>
+							</select>
+						</td>
+						<td>
+							<select th:onchange="changeAccountStatus([[ ${row.id} ]], this.value)">
+								<option value="Y" th:selected="${row.failedCount >= 5}">Y</option>
+								<option value="N" th:selected="${row.failedCount < 5}">N</option>
+							</select>
+						</td>
+						<td>
+							<input type="button" class="btn btn_gray" value="삭제" th:onclick="deleteUser([[ ${row.email} ]])" />
+						</td>
+					</tr>
+					<tr th:unless="${not #lists.isEmpty( users )}">
+						<td colspan="6">존재하지 않는 회원입니다.</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<!--/* //.board_list */-->
+
+		<!--/* common.html의 paging fragment */-->
+		<div th:replace="fragments/common :: paging"></div>
+	</div>
+	<!--/* //.inner */-->
+
+</html>

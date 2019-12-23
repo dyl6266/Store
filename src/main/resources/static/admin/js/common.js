@@ -168,3 +168,33 @@ function getHeaders(method) {
 
 	return headers;
 }
+
+/**
+ * 페이징 결과 HTML 반환
+ * 
+ * @param uri - 요청 URI
+ * @param queryString - 파라미터 쿼리 스트링
+ * @param element - html() 함수를 적용할 엘러먼트
+ * @returns 페이징 결과 HTML
+ */
+function movePage(uri, queryString, element) {
+
+	/* 검색 유형, 검색 키워드, Ajax 요청 여부를 포함한 요청 URI */
+	var requestUri = uri + queryString + "&isAjax=true";
+
+	$.get(requestUri, function(response) {
+		/* HTML 또는 요소가 비어있는 경우 쿼리 스트링이 존재하지 않는 기본 URI로 이동 */
+		if (isEmpty(response) == true || element == (null || undefined)) {
+			location.href = uri;
+		} else {
+			/* 결과 HTML Overwrite */
+			$(element).html(response);
+
+			/* 비동기 처리에서 도메인(주소) 변경 */
+			if (isPushStateAvailable() == true) {
+				/* uri를 requestUri로 지정하면 isAjax=true가 파라미터로 포함되기 때문에 새로고침 시 list-ajax를 반환하는 문제가 발생 */
+				history.pushState(null, null, uri + queryString); /*[- state, title, uri -]*/
+			}
+		}
+	}, "html");
+}

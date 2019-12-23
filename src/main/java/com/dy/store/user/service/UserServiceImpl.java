@@ -16,6 +16,7 @@ import com.dy.store.authority.constant.Authority;
 import com.dy.store.authority.domain.AuthorityDto;
 import com.dy.store.authority.mapper.AuthorityMapper;
 import com.dy.store.common.constant.YesNo;
+import com.dy.store.common.paging.PaginationInfo;
 import com.dy.store.user.domain.UserDto;
 import com.dy.store.user.mapper.UserMapper;
 
@@ -161,16 +162,25 @@ public class UserServiceImpl implements UserService {
 	/**
 	 * 사용자 목록 조회
 	 * 
+	 * @param params - UserDto
 	 * @return 사용자 목록
 	 */
 	@Override
-	public List<UserDto> getUserList() {
+	public List<UserDto> getUserList(UserDto params) {
 
+		/* 사용자 목록을 담을 비어있는 리스트 */
 		List<UserDto> userList = Collections.emptyList();
+		/* 전체 사용자 수 */
+		int userTotalCount = userMapper.selectUserTotalCount(params);
 
-		int userTotalCount = userMapper.selectUserTotalCount(null);
+		/* 페이징 계산에 필요한 전체 회원 수 저장 */
+		params.setTotalRecordCount(userTotalCount);
+		/* Pagination 클래스에서 페이징 정보를 계산하고, 계산이 완료된 paginationInfo를 params에 저장 */
+		params.setPaginationInfo(new PaginationInfo(params));
+
 		if (userTotalCount > 0) {
-			userList = userMapper.selectUserList();
+			/* 사용자 목록 조회 */
+			userList = userMapper.selectUserList(params);
 
 			/* 사용자 권한 목록 저장 */
 			for (UserDto user : userList) {

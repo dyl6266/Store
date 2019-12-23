@@ -9,7 +9,6 @@ public class MyBatisUtils {
 	 * 오브젝트가 타입에 관계없이 비어있는지 확인
 	 * 
 	 * @param objs - 일정하지 않은 개수의 오브젝트
-	 * 
 	 * @return boolean
 	 */
 	public static boolean isEmpty(Object... objs) {

@@ -106,9 +106,11 @@
 			user
 		<where>
 			delete_yn = 'N'
+			<include refid="CommonMapper.search" />
 		</where>
 		ORDER BY
 			  id DESC, created_date DESC
+		<include refid="CommonMapper.paging" />
 	</select>
 
 	<!-- 전체 사용자 수 조회 -->
@@ -135,6 +137,7 @@
 					)
 				</when>
 			</choose>
+			<include refid="CommonMapper.search" />
 		</where>
 	</select>
 
