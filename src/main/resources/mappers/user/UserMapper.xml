@@ -85,6 +85,9 @@
 		<if test="@com.dy.store.common.util.MyBatisUtils@isEmpty( birthday ) == false">
 			, birthday = #{birthday}
 		</if>
+		<if test="@com.dy.store.common.util.MyBatisUtils@isEmpty( failedCount ) == false">
+			, failed_count = #{failedCount}
+		</if>
 		WHERE
 			email = #{email}
 	</update>

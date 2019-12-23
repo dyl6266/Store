@@ -4,9 +4,11 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.dao.DataAccessException;
 import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -165,13 +167,13 @@ public class UserRestController {
 	}
 
 	/**
-	 * 회원정보 상세 조회
+	 * 사용자 정보 조회
 	 * 
 	 * @param param - 아이디 또는 닉네임
-	 * @return 메시지, 결과를 담은 Json
+	 * @return 사용자 정보를 담은 Json
 	 */
 	@GetMapping(value = "/users/{param}")
-	public JsonObject getUserDetail(@PathVariable String param) {
+	public JsonObject getUserDetail(@PathVariable final String param) {
 
 		JsonObject jsonObj = new JsonObject();
 
@@ -187,18 +189,90 @@ public class UserRestController {
 	/**
 	 * 사용자 목록 조회
 	 * 
-	 * @return
+	 *@param params - UserDto
+	 * @return 사용자 목록을 담은 Json
 	 */
 	@GetMapping(value = "/users")
-	public JsonObject getUserList() {
+	public JsonObject getUserList(final UserDto params) {
 
 		JsonObject jsonObj = new JsonObject();
 
-		List<UserDto> userList = userService.getUserList();
+		List<UserDto> userList = userService.getUserList(params);
 		if (CollectionUtils.isEmpty(userList) == false) {
 			JsonElement jsonElem = new Gson().toJsonTree(userList).getAsJsonArray();
 			JsonArray jsonArr = jsonElem.getAsJsonArray();
 			jsonObj.add("users", jsonArr);
+		}
+
+		return jsonObj;
+	}
+
+	/**
+	 * 사용자 정보 변경
+	 * 
+	 * @param id - PK
+	 * @param params - UserDto
+	 * @return 메시지, 결과를 담은 Json
+	 */
+	@PatchMapping(value = "/users/{id}")
+	public JsonObject modifyUserInfo(@PathVariable("id") Long id, @RequestBody final UserDto params) {
+
+		JsonObject jsonObj = new JsonObject();
+
+		if (id == null) {
+			jsonObj.addProperty("message", "올바르지 않은 접근입니다.");
+			jsonObj.addProperty("result", false);
+		}
+
+		try {
+			boolean isModified = userService.registerUser(params);
+			if (isModified == false) {
+				jsonObj.addProperty("message", "회원정보 변경에 실패하였습니다.");
+			}
+			jsonObj.addProperty("result", isModified);
+
+		} catch (DataAccessException e) {
+			jsonObj.addProperty("message", "데이터베이스 처리 중에 문제가 발생하였습니다.");
+			jsonObj.addProperty("result", false);
+
+		} catch (Exception e) {
+			jsonObj.addProperty("message", "시스템에 문제가 발생하였습니다.");
+			jsonObj.addProperty("result", false);
+		}
+
+		return jsonObj;
+	}
+
+	/**
+	 * 사용자 삭제
+	 * 
+	 * @param email - 아이디
+	 * @return 메시지, 결과를 담은 Json
+	 */
+	@DeleteMapping(value = "/users/{email}")
+	public JsonObject deleteUser(@PathVariable("email") final String email) {
+
+		JsonObject jsonObj = new JsonObject();
+
+		if (Strings.isBlank(email) == true) {
+			jsonObj.addProperty("message", "올바르지 않은 접근입니다.");
+			jsonObj.addProperty("result", false);
+		}
+
+		try {
+			boolean isDledted = userService.deleteUser(email);
+			if (isDledted == false) {
+				jsonObj.addProperty("message", "회원 삭제에 실패하였습니다.");
+			}
+			jsonObj.addProperty("result", isDledted);
+
+		} catch (DataAccessException e) {
+			jsonObj.addProperty("message", "데이터베이스 처리 중에 문제가 발생하였습니다.");
+			jsonObj.addProperty("result", false);
+
+		} catch (Exception e) {
+			jsonObj.addProperty("message", "시스템에 문제가 발생하였습니다.");
+			jsonObj.addProperty("result", false);
 		}
 
 		return jsonObj;

@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -81,10 +82,13 @@ public class UserServiceImpl implements UserService {
 
 			/* Update (파라미터에 PK가 존재하는 경우) */
 		} else {
-			user = UserDto.builder().nickname(params.getNickname()).build();
-			userCount = userMapper.selectUserTotalCount(user);
-			if (userCount > 0) {
-				return false;
+			/* 파라미터에 닉네임이 존재하는 경우 */
+			if (Strings.isBlank(params.getNickname()) == false) {
+				user = UserDto.builder().nickname(params.getNickname()).build();
+				userCount = userMapper.selectUserTotalCount(user);
+				if (userCount > 0) {
+					return false;
+				}
 			}
 
 			queryResult = userMapper.updateUser(params);
@@ -156,7 +160,7 @@ public class UserServiceImpl implements UserService {
 			return false;
 		}
 
-		return false;
+		return true;
 	}
 
 	/**
@@ -216,6 +220,11 @@ public class UserServiceImpl implements UserService {
 	 */
 	@Override
 	public boolean modifyUserLoginFailureCount(String email, int failedCount) {
+
+		UserDto user = userMapper.selectUserDetailByEmailOrNickname(email);
+		if (user == null) {
+			return false;
+		}
 
 		UserDto params = UserDto.builder().email(email).failedCount(failedCount).build();
 

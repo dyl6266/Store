@@ -32,11 +32,11 @@
 							</dd>
 						</dl>
 						<dl>
-							<dt>데이터 수</dt>
+							<dt>보기</dt>
 							<dd>
 								<select name="recordCountPerPage" onchange="changeRecordCounrPerPage(this)">
 									<option value="8">기본</option>
-									<option th:each="seq : ${#numbers.sequence(5, 50, 5)}" th:value="${seq}" th:text="${seq}" th:selected="${seq == params.recordCountPerPage}"></option>
+									<option th:each="seq : ${#numbers.sequence(5, 50, 5)}" th:value="${seq}" th:text="${seq} + '개씩'" th:selected="${seq == params.recordCountPerPage}"></option>
 								</select>
 							</dd>
 						</dl>
@@ -76,14 +76,17 @@
 									</select>
 								</td>
 								<td>
-									<select th:onchange="changeAccountStatus([[ ${row.id} ]], this.value)">
-										<option value="Y" th:selected="${row.failedCount >= 5}">Y</option>
-										<option value="N" th:selected="${row.failedCount < 5}">N</option>
+									<select th:onchange="changeAccountStatus([[ ${row.id} ]], [[ ${row.email} ]], this)">
+										<option value="5" th:selected="${row.failedCount >= 5}">Y</option>
+										<option value="0" th:selected="${row.failedCount < 5}">N</option>
 									</select>
 								</td>
 								<td>
-									<input type="button" class="btn btn_gray" value="삭제" th:onclick="deleteUser([[ ${row.email} ]])" />
+									<input type="button" class="btn btn_gray" value="삭제" th:onclick="deleteUser([[ ${row.email} ]], [[ ${params.paginationInfo.makeSearchQueryString(params.currentPageNo)} ]])" />
 								</td>
+							</tr>
+							<tr th:unless="${not #lists.isEmpty( users )}">
+								<td colspan="6">존재하지 않는 회원입니다.</td>
 							</tr>
 						</tbody>
 					</table>
@@ -103,6 +106,26 @@
 		/* <![CDATA[ */
 
 			/**
+			 * 사용자 목록 Ajax 호출 결과 HTML을 화면에 렌더링
+			 */
+			function printUserListHtml(uri) {
+
+				/*[- Ajax 호출 -]*/
+				$.get(uri + "&isAjax=true", function(response) {
+					$("#paging").html(response);
+
+					/*[- 비동기 처리에서 도메인(주소) 변경 -]*/
+					if (isPushStateAvailable() == true) {
+						history.pushState(null, null, uri); /*[- state, title, uri -]*/
+					}
+				}, "html");
+
+				return false;
+			}
+			/*[- end of function -]*/
+
+
+			/**
 			 * 사용자 검색
 			 */
 			function searchUser(form) {
@@ -119,15 +142,7 @@
 				var uri = form.action + queryString;
 				uri += "&searchType=" + form.searchType.value + "&searchKeyword=" + form.searchKeyword.value;
 
-				/*[- Ajax 호출 -]*/
-				$.get(uri + "&isAjax=true", function(response) {
-					$("#paging").html(response);
-
-					/*[- 비동기 처리에서 도메인(주소) 변경 -]*/
-					if (isPushStateAvailable() == true) {
-						history.pushState(null, null, uri); /*[- state, title, uri -]*/
-					}
-				}, "html");
+				printUserListHtml(uri);
 
 				return false;
 			}
@@ -149,16 +164,85 @@
 				var uri = obj.form.action + "?" + queryString;
 				uri += "&searchType=" + obj.form.searchType.value + "&searchKeyword=" + obj.form.searchKeyword.value;
 
-				/*[- Ajax 호출 -]*/
-				$.get(uri + "&isAjax=true", function(response) {
-					$("#paging").html(response);
-
-					/*[- 비동기 처리에서 도메인(주소) 변경 -]*/
-					if (isPushStateAvailable() == true) {
-						history.pushState(null, null, uri); /*[- state, title, uri -]*/
-					}
-				}, "html");
+				printUserListHtml(uri);
 			}
+			/*[- end of function -]*/
+
+
+			/**
+			 * 사용자 계정 상태 변경
+			 */
+			function changeAccountStatus(id, email, obj) {
+
+				var uri = /*[[ @{/users/} ]]*/;
+				uri += id;
+
+				var params = { "id" : id, "email" : email, "failedCount" : obj.value };
+
+				$.ajax({
+					url : uri,
+					type : "patch",
+					headers : getHeaders("patch"),
+					dataType : "json",
+					data : JSON.stringify(params),
+					async : false,
+					success : function(response) {
+						if (response.result == false) {
+							alert("계정 상태 변경에 실패하였습니다.");
+							return false;
+						}
+
+						alert("계정 상태 변경이 완료되었습니다.");
+					},
+					error : function(request, status, error) {
+						alert("오류가 발생하였습니다.");
+					}
+				});
+				/*[- end of ajax -]*/
+
+				return false;
+			}
+			/*[- end of function -]*/
+
+
+			/**
+			 * 사용자 삭제
+			 */
+			function deleteUser(email, queryString) {
+
+				var message = "\"" + email + "\" 계정을 삭제할까요?";
+				if (confirm(message) == false) {
+					return false;
+				}
+
+				var uri = /*[[ @{/users/} ]]*/;
+				uri += email;
+
+				$.ajax({
+					url : uri,
+					type : "delete",
+					headers : getHeaders("delete"),
+					dataType : "json",
+					async : false,
+					success : function(response) {
+						if (response.result == false) {
+							alert("계정 삭제에 실패하였습니다.");
+							return false;
+						}
+
+						/*[- 검색 유형, 검색 키워드를 포함한 Request URI -]*/
+						uri = /*[[ ${#request.requestURI} ]]*/;
+						uri += queryString;
+
+						printUserListHtml(uri);
+						alert("계정 삭제가 완료되었습니다.");
+					},
+					error : function(request, status, error) {
+						alert("오류가 발생하였습니다.");
+					}
+				});
+			}
+			/*[- end of function -]*/
 
 		/* ]]> */
 		</script>

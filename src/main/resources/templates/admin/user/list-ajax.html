@@ -29,11 +29,11 @@
 					</dd>
 				</dl>
 				<dl>
-					<dt>데이터 수</dt>
+					<dt>보기</dt>
 					<dd>
 						<select name="recordCountPerPage" onchange="changeRecordCounrPerPage(this)">
 							<option value="8">기본</option>
-							<option th:each="seq : ${#numbers.sequence(5, 50, 5)}" th:value="${seq}" th:text="${seq}" th:selected="${seq == params.recordCountPerPage}"></option>
+							<option th:each="seq : ${#numbers.sequence(5, 50, 5)}" th:value="${seq}" th:text="${seq} + '개씩'" th:selected="${seq == params.recordCountPerPage}"></option>
 						</select>
 					</dd>
 				</dl>
@@ -73,13 +73,13 @@
 							</select>
 						</td>
 						<td>
-							<select th:onchange="changeAccountStatus([[ ${row.id} ]], this.value)">
-								<option value="Y" th:selected="${row.failedCount >= 5}">Y</option>
-								<option value="N" th:selected="${row.failedCount < 5}">N</option>
+							<select th:onchange="changeAccountStatus([[ ${row.id} ]], [[ ${row.email} ]], this)">
+								<option value="5" th:selected="${row.failedCount >= 5}">Y</option>
+								<option value="0" th:selected="${row.failedCount < 5}">N</option>
 							</select>
 						</td>
 						<td>
-							<input type="button" class="btn btn_gray" value="삭제" th:onclick="deleteUser([[ ${row.email} ]])" />
+							<input type="button" class="btn btn_gray" value="삭제" th:onclick="deleteUser([[ ${row.email} ]], [[ ${params.paginationInfo.makeSearchQueryString(params.currentPageNo)} ]])" />
 						</td>
 					</tr>
 					<tr th:unless="${not #lists.isEmpty( users )}">
