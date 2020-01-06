@@ -339,3 +339,31 @@ html {min-width: 1024px;}
 
 .pd_regi .table_wrap ul.thead {border-top: 2px solid #333;}
 .pd_regi .table_wrap ul.thead li span.type1 {width: calc(100% - 70px); border-right: 0;}
+
+
+/* Layer popup (회원 권한) */
+.popup_wrap {display: none; position: fixed; left: 0; top: 0; right: 0; bottom: 0; z-index: 999;  transition: all.5s ease; overflow-y: auto;}
+.popup_inner {position: relative; max-width: 1000px; margin: 50px auto; background: #fff; border-radius: 15px; z-index: 2; box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);}
+.popup_inner .btn_close {position: absolute; right: 0; top: 0; width: 55px; height: 55px; background: url('../../user/images/common/ic_close.png') center center no-repeat; background-size: 20px; text-indent: -9999px; z-index: 99; border: 0; cursor: pointer;}
+.popup_inner .popup_header {position: relative;}
+.popup_inner .popup_header p {height: 55px; line-height: 55px; padding: 0 25px; font-size: 20px; letter-spacing: 0; font-weight: 500; color: #000;}
+.popup_inner .popup_contents {}
+
+.popup_bg {position: fixed; left: 0; top: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); z-index: 1;}
+
+.table {display: table; width: 100%;}
+.table.table_head {height: 40px; text-align: center; border-top: 1px solid #000; border-bottom: 1px solid #ddd;}
+.table .table_row {display: table-row;}
+.table .table_row > * {display: table-cell; vertical-align: middle;}
+.table.table_body .table_row > * {border-bottom: 1px solid #ddd;}
+
+#authPop .popup_inner {width: 600px;}
+#authPop .popup_contents {padding: 0 25px 25px;}
+#authPop .table.table_body .table_row > * {height: 80px; text-align: center;}
+#authPop .table .table_row > .col1 {width: 90px;}
+#authPop .table .table_row > .col2 {}
+#authPop .table .table_row > .col3 {width: 120px;}
+#authPop .table .table_row > .col4 {width: 80px;}
+#authPop .table .label_basic {display: block; width: 70px; height: 20px; margin: 2px auto 0; padding: 0; line-height: 18px; text-align: center; color: #ee782f; font-size: 12px; border: 1px solid #ee782f;}
+#authPop .table .btn {width: auto; height: 25px; margin-top: 5px; padding: 0 10px; line-height: 23px; font-size: 12px; -webkit-transition: all .2s ease; -moz-transition: all .2s ease; -o-transition: all .2s ease; -ms-transition: all .2s ease; transition: all .2s ease;}
+#authPop .table .btn:hover {color: #fff !important; background: #000; border: 1px solid #000;}

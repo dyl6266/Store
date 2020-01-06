@@ -82,6 +82,7 @@
 									</select>
 								</td>
 								<td>
+									<input type="button" class="btn btn_gray" value="권한" th:onclick="openUserAuthPopup([[ ${row.email} ]])" />
 									<input type="button" class="btn btn_gray" value="삭제" th:onclick="deleteUser([[ ${row.email} ]], [[ ${params.paginationInfo.makeSearchQueryString(params.currentPageNo)} ]])" />
 								</td>
 							</tr>
@@ -97,8 +98,12 @@
 				<div th:replace="fragments/common :: paging"></div>
 			</div>
 			<!--/* //.inner */-->
+
 		</div>
 		<!--/* //.contents */-->
+
+		<!--/* 권한 관리 팝업 */-->
+		<div id="authPop" class="popup_wrap"></div>
 	</th:block>
 
 	<th:block layout:fragment="script">
@@ -206,7 +211,7 @@
 
 
 			/**
-			 * 사용자 삭제
+			 * 사용자 삭제 (TODO => currentPageNo과 lastPage를 paginationInfo에서 어떻게 처리해야 할지 생각해보기)
 			 */
 			function deleteUser(email, queryString) {
 
@@ -241,6 +246,22 @@
 						alert("오류가 발생하였습니다.");
 					}
 				});
+			}
+			/*[- end of function -]*/
+
+
+			/**
+			 * 사용자 권한 관리 팝업
+			 */
+			function openUserAuthPopup(email) {
+
+				var uri = /*[[ @{/admin/user/auth-popup} ]]*/;
+				uri += "?email=" + email;
+
+				$.get(uri, function(response) {
+					$("#authPop").html(response);
+					popOpen("#authPop");
+				}, "html");
 			}
 			/*[- end of function -]*/
 

@@ -27,11 +27,29 @@
 		)
 	</insert>
 
-	<!-- 사용자 권한 삭제 -->
-	<update id="deleteUserAuthority" parameterType="AuthorityDto">
+	<!-- 사용자 권한 조회 -->
+	<select id="selectUserAuthorityDetail" parameterType="AuthorityDto" resultType="AuthorityDto">
+		SELECT
+			<include refid="authorityColumns" />
+		FROM
+			authority
+		<where>
+			<!-- Insert 처리 시에 이미 등록되어 있지만 delete_yn의 값이 'Y'를 가지는 경우를 제외하기 위한 처리 -->
+			<if test="@com.dy.store.common.util.MyBatisUtils@isEmpty( deleteYn ) == false">
+				delete_yn = #{deleteYn}
+			</if>
+			AND
+				email = #{email}
+			AND
+				name = #{name}
+		</where>
+	</select>
+
+	<!-- 사용자 권한 상태 변경 -->
+	<update id="updateUserAuthorityStatus" parameterType="AuthorityDto">
 		UPDATE authority
 		SET
-			delete_yn = 'Y'
+			delete_yn = #{deleteYn}
 		WHERE
 			email = #{email}
 		AND

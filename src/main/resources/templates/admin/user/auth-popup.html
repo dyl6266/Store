@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+	<div class="popup_inner">
+		<div class="popup_header">
+			<p th:text="|${user.nickname}님의 권한 관리|"></p>
+			<a href="#none" class="btn btn_close" onclick="popClose(this);">닫기</a>
+		</div>
+		<div class="popup_contents">
+			<div class="table table_head">
+				<div class="table_row">
+					<div class="col1">권한명</div>
+					<div class="col2"></div>
+					<div class="col3">선택</div>
+				</div>
+			</div>
+			<ul th:if="${user != null}" th:with="authorities=${T(com.dy.store.authority.constant.Authority).values()}" class="table table_body">
+				<li th:each="authority, status : ${authorities}" class="table_row">
+					<div class="col1">
+						<span th:text="${authority.value}"></span>
+						<!--/* 전체 권한 상수와 비교했을 때, 해당 회원에게 이미 존재하는 권한임을 알리는 엘러먼트 (index로 비교할 수 없을 때에는 each로 비교하여 처리할 수 있음) */-->
+						<span th:each="userAuth, status : ${user.authorities}" th:if="${#strings.equals(authority, #strings.replace(userAuth, 'ROLE_', ''))}" class="label label_basic">Yes</span>
+					</div>
+					<div class="col2"></div>
+					<div class="col3">
+						<button type="button" class="btn btn_border_black" th:onclick="addUserAuthority([[ ${authority} ]])">추가</button>
+						<button type="button" class="btn btn_border_black" th:onclick="deleteUserAuthority([[ ${authority} ]])">삭제</button>
+					</div>
+				</li>
+			</ul>
+			<ul th:unless="${user != null}" class="table table_body">
+				<li class="table_row">
+					<div>배송지가 존재하지 않습니다.</div>
+				</li>
+			</ul>
+		</div>
+		<!--/* //.popup_contents */-->
+	</div>
+	<!--/* //.popup_inner */-->
+	<div class="popup_bg" onclick="popClose(this);"></div>
+
+	<script th:inline="javascript">
+	/* <![CDATA[ */
+
+		/**
+		 * 사용자 권한 추가
+		 */
+		function addUserAuthority(name) {
+
+			/*[- 사용자 아이디 -]*/
+			var email = /*[[ ${user.email} ]]*/;
+			/*[- Request URI -]*/
+			var uri = /*[[ @{/authorities/} ]]*/;
+			uri += email;
+			/*[- Ajax 요청에 사용되는 파라미터 -]*/
+			var params = null;
+
+			/*[- 사용자 권한 중복 확인 -]*/
+			$.get(uri + "/" + name, function(response) {
+
+				/*[- 권한이 DB에 존재하지 않을 때 -]*/
+				if (isEmpty(response) == true) {
+					params = { "email" : email, "name" : name };
+
+					$.ajax({
+						url : /*[[ @{/authorities} ]]*/,
+						type : "post",
+						headers : getHeaders("post"),
+						dataType : "json",
+						data : JSON.stringify(params),
+						async : false,
+						success : function(response) {
+							if (isEmpty(response.message) == false) {
+								alert(response.message);
+								return false;
+							}
+							/*[- 팝업 HTML 불러오기 -]*/
+							openUserAuthPopup(email);
+						},
+						error : function(request, status, error) {
+							alert("오류가 발생하였습니다.");
+						}
+					});
+					/*[- end of ajax -]*/
+
+				/*[- 권한이 DB에 존재하고 삭제 여부가 'Y'일 때 -]*/
+				} else {
+					if (response.authority.deleteYn == "N") {
+						alert("이미 추가되어 있는 권한입니다.");
+						return false;
+					}
+
+					params = { "email" : email, "name" : name, "deleteYn" : "N" };
+
+					$.ajax({
+						url : uri,
+						type : "patch",
+						headers : getHeaders("patch"),
+						dataType : "json",
+						data : JSON.stringify(params),
+						async : false,
+						success : function(response) {
+							if (isEmpty(response.message) == false) {
+								alert(response.message);
+								return false;
+							}
+							/*[- 팝업 HTML 불러오기 -]*/
+							openUserAuthPopup(email);
+						},
+						error : function(request, status, error) {
+							alert("오류가 발생하였습니다.");
+						}
+					});
+					/*[- end of ajax -]*/
+				}
+				/*[- end of else -]*/
+			});
+			/*[- end of get -]*/
+
+			return false;
+		}
+		/*[- end of method -]*/
+
+
+		/**
+		 * 사용자 권한 삭제
+		 */
+		function deleteUserAuthority(name) {
+
+			/*[- 사용자 아이디 -]*/
+			var email = /*[[ ${user.email} ]]*/;
+			/*[- Request URI -]*/
+			var uri = /*[[ @{/authorities/} ]]*/;
+			uri += email;
+
+			$.get(uri + "/" + name, function(response) {
+				if (response.authority.deleteYn == "Y") {
+					alert("등록되어 있지 않은 권한입니다.");
+					return false;
+				}
+			});
+
+			/*[- Ajax 요청에 사용되는 파라미터 -]*/
+			var params = { "email" : email, "name" : name, "deleteYn" : "Y" };
+
+			$.ajax({
+				url : uri,
+				type : "patch",
+				headers : getHeaders("patch"),
+				dataType : "json",
+				data : JSON.stringify(params),
+				async : false,
+				success : function(response) {
+					if (isEmpty(response.message) == false) {
+						alert(response.message);
+						return false;
+					}
+					/*[- 팝업 HTML 불러오기 -]*/
+					openUserAuthPopup(email);
+				},
+				error : function(request, status, error) {
+					alert("오류가 발생하였습니다.");
+				}
+			});
+			/*[- end of ajax -]*/
+		}
+		/*[- end of function -]*/
+
+	/* ]]> */
+	</script>
+
+</html>

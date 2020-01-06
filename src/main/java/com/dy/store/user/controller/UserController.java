@@ -77,4 +77,25 @@ public class UserController {
 		return (isAjax == false) ? "admin/user/list" : "admin/user/list-ajax";
 	}
 
+	/**
+	 * 관리자 사용자 권한 팝업
+	 * 
+	 * @param email - 아이디
+	 * @param model
+	 * @return
+	 */
+	@GetMapping(value = "/admin/user/auth-popup")
+	public String openAdminUserAuthPopup(@RequestParam(value = "email", required = false) String email, Model model) {
+
+		// TODO => 공통 리다이렉트 기능으로 변경하기
+		if (Strings.isBlank(email) == true) {
+			return null;
+		}
+
+		UserDto user = (UserDto) userService.loadUserByUsername(email);
+		model.addAttribute("user", user);
+
+		return "admin/user/auth-popup";
+	}
+
 }

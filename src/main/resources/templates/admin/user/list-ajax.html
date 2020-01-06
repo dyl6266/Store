@@ -79,6 +79,7 @@
 							</select>
 						</td>
 						<td>
+							<input type="button" class="btn btn_gray" value="권한" th:onclick="openUserAuthPopup([[ ${row.email} ]])" />
 							<input type="button" class="btn btn_gray" value="삭제" th:onclick="deleteUser([[ ${row.email} ]], [[ ${params.paginationInfo.makeSearchQueryString(params.currentPageNo)} ]])" />
 						</td>
 					</tr>
