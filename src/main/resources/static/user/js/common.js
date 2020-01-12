@@ -110,7 +110,7 @@ function makeAjaxRequestData(form) {
 	});
 
 	/* spring security csrf 토큰 제거 => header에 정보를 담아서 전송하기 때문에 문제가 되지 않음 */
-	delete obj._csrf;
+	obj._csrf = null;
 	return obj;
 }
 
@@ -144,6 +144,26 @@ function getHeaders(method) {
 	headers["Content-Type"] = "application/json";
 	headers["X-HTTP-Method-Override"] = method;
 	headers["X-CSRF-TOKEN"] = getToken();
+
+	return headers;
+}
+
+/**
+ * Ajax 호출에 필요한 헤더 반환
+ * 
+ * @param method - HTTP 요청 메소드
+ * @param contentType - Content-Type 포함 여부 (FormData 등을 사용하면 다른 Content-Type을 사용)
+ * @returns Headers
+ */
+function getHeaders(method, contentType) {
+
+	var headers = new Object();
+	headers["X-HTTP-Method-Override"] = method;
+	headers["X-CSRF-TOKEN"] = getToken();
+
+	if (contentType == true) {
+		headers["Content-Type"] = "application/json";
+	}
 
 	return headers;
 }

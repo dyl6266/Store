@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.dy.store.goods.mapper.GoodsMapper">
+
+	<!-- goods 테이블 전체 컬럼 -->
+	<sql id="goodsColumns">
+		  id
+		, code
+		, name
+		, description
+		, price
+		, status
+		, rate
+		, delete_yn
+		, created_date
+		, modified_date
+	</sql>
+
+	<!-- 상품 등록 -->
+	<insert id="insertGoods" parameterType="GoodsDto">
+		<!-- 상품 코드 생성 -->
+		<selectKey keyProperty="code" resultType="string" order="BEFORE">
+			SELECT
+				CONCAT('GOODS-', LPAD(COUNT(id) + 1, 5, 0)) AS code
+			FROM
+				goods
+		</selectKey>
+		INSERT INTO goods (
+			<include refid="goodsColumns" />
+		) VALUES (
+			  #{id}
+			, #{code}
+			, #{name}
+			, #{description}
+			, #{price}
+			, IFNULL(#{status}, 'NORMAL')
+			, IFNULL(#{rate}, 0)
+			, 'N'
+			, NOW()
+			, NULL
+		)
+	</insert>
+
+	<!-- 상품 정보 조회 -->
+	<select id="selectGoodsDetail" parameterType="string" resultType="GoodsDto">
+		SELECT
+			<include refid="goodsColumns" />
+		FROM
+			goods
+		<where>
+			delete_yn = 'N'
+		AND
+			code = #{value}
+		</where>
+	</select>
+
+	<!-- 상품 정보 수정 -->
+	<update id="updateGoods" parameterType="GoodsDto">
+		UPDATE goods
+		SET
+			modified_date = NOW()
+			<if test="@com.dy.store.common.util.MyBatisUtils@isEmpty( name ) == false">
+			, name = #{name}
+			</if>
+			<if test="@com.dy.store.common.util.MyBatisUtils@isEmpty( description ) == false">
+			, description = #{description}
+			</if>
+			<if test="@com.dy.store.common.util.MyBatisUtils@isEmpty( price ) == false">
+			, price = #{price}
+			</if>
+			<if test="@com.dy.store.common.util.MyBatisUtils@isEmpty( rate ) == false">
+			, rate = #{rate}
+			</if>
+			<if test="@com.dy.store.common.util.MyBatisUtils@isEmpty( status ) == false">
+			, status = #{status}
+			</if>
+		WHERE
+			code = #{code}
+	</update>
+
+	<!-- 상품 삭제 -->
+	<update id="deleteGoods" parameterType="list">
+		UPDATE goods
+		SET
+			delete_yn = 'Y'
+		WHERE
+			code IN
+			<foreach item="value" index="index" collection="list" open="(" separator="," close=")">
+				#{value}
+			</foreach>
+	</update>
+
+	<!-- 상품 목록 조회 -->
+	<select id="selectGoodsList" parameterType="GoodsDto" resultType="GoodsDto">
+		SELECT
+			<include refid="goodsColumns" />
+		FROM
+			goods
+		<where>
+			delete_yn = 'N'
+		</where>
+		ORDER BY
+			  id DESC, created_date DESC
+		<include refid="CommonMapper.paging" />
+	</select>
+
+	<!-- 전체 상품 수 조회 -->
+	<select id="selectGoodsTotalCount" parameterType="GoodsDto" resultType="int">
+		SELECT
+			COUNT(*)
+		FROM
+			goods
+		<where>
+			delete_yn = 'N'
+			<if test="@com.dy.store.common.util.MyBatisUtils@isEmpty( status ) == false">
+				AND status = #{status}
+			</if>
+		</where>
+	</select>
+
+</mapper>

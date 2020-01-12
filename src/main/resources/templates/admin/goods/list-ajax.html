@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+	<div class="page_route">
+		<a href="#" class="home" title="Home">Home</a>
+		<a th:href="@{/admin/goods/list}" title="상품 관리">상품 관리</a>
+		<a th:href="@{/admin/goods/list}" title="상품 목록">상품 목록</a>
+	</div>
+
+	<div class="inner">
+		<h1 class="page_title">상품 관리</h1>
+
+		<form th:action="@{/admin/goods/list}" method="get" onsubmit="return searchGoods(this)">
+			<div class="search_box text_center">
+				<dl>
+					<dt>키워드</dt>
+					<dd>
+						<input type="text" name="searchKeyword" class="wd150" placeholder="상품명을 입력해 주세요." />
+						<input type="submit" value="검색" class="btn btn_search" />
+					</dd>
+				</dl>
+				<dl>
+					<dt>보기</dt>
+					<dd>
+						<select name="recordCountPerPage" onchange="changeRecordCounrPerPage(this)">
+							<option value="8">기본</option>
+							<option th:each="seq : ${#numbers.sequence(5, 50, 5)}" th:value="${seq}" th:text="${seq} + '개씩'" th:selected="${seq == params.recordCountPerPage}"></option>
+						</select>
+					</dd>
+				</dl>
+			</div>
+			<!--/* .search_box */-->
+		</form>
+
+		<div class="pd_list">
+			<ul th:if="${not #lists.isEmpty( goods )}">
+				<li th:each="row, status : ${goods}">
+					<a th:href="@{/admin/goods/register( code=${row.code} )}" class="img_wrap">
+						<span class="img_box">
+							<img src="" />
+						</span>
+					</a>
+					<a href="" class="txt_wrap">
+						<span th:text="${row.name}" class="name">상품명</span>
+						<span th:text="${#numbers.formatInteger( row.price, 3, 'COMMA' )}" class="price">가격</span>
+					</a>
+				</li>
+			</ul>
+
+			<div class="btn_wrap text_right">
+				<a th:href="@{/admin/goods/register}" class="btn btn_navy" title="등록">등록</a>
+			</div>
+		</div>
+		<!--/* //.pd_list */-->
+
+		<!--/* common.html의 paging fragment */-->
+		<div th:replace="fragments/common :: paging"></div>
+	</div>
+	<!--/* //.inner */-->
+
+</html>

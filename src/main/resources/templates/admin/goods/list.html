@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layout/admin/basic">
+
+	<th:block layout:fragment="content">
+		<!--/* 페이징 결과를 Overwrite할 엘러먼트에 id를 paging으로 지정 */-->
+		<div id="paging" class="contents">
+			<div class="page_route">
+				<a href="#" class="home" title="Home">Home</a>
+				<a th:href="@{/admin/goods/list}" title="상품 관리">상품 관리</a>
+				<a th:href="@{/admin/goods/list}" title="상품 목록">상품 목록</a>
+			</div>
+
+			<div class="inner">
+				<h1 class="page_title">상품 관리</h1>
+
+				<form th:action="@{/admin/goods/list}" method="get" onsubmit="return searchGoods(this)">
+					<div class="search_box text_center">
+						<dl>
+							<dt>키워드</dt>
+							<dd>
+								<input type="text" name="searchKeyword" class="wd150" placeholder="상품명을 입력해 주세요." />
+								<input type="submit" value="검색" class="btn btn_search" />
+							</dd>
+						</dl>
+						<dl>
+							<dt>보기</dt>
+							<dd>
+								<select name="recordCountPerPage" onchange="changeRecordCounrPerPage(this)">
+									<option value="8">기본</option>
+									<option th:each="seq : ${#numbers.sequence(5, 50, 5)}" th:value="${seq}" th:text="${seq} + '개씩'" th:selected="${seq == params.recordCountPerPage}"></option>
+								</select>
+							</dd>
+						</dl>
+					</div>
+					<!--/* .search_box */-->
+				</form>
+
+				<div class="pd_list">
+					<ul th:if="${not #lists.isEmpty( goods )}">
+						<li th:each="row, status : ${goods}">
+							<a th:href="@{/admin/goods/register( code=${row.code} )}" class="img_wrap">
+								<span class="img_box">
+									<img src="" />
+								</span>
+							</a>
+							<a href="" class="txt_wrap">
+								<span th:text="${row.name}" class="name">상품명</span>
+								<span th:text="${#numbers.formatInteger( row.price, 3, 'COMMA' )}" class="price">가격</span>
+							</a>
+						</li>
+					</ul>
+
+					<div class="btn_wrap text_right">
+						<a th:href="@{/admin/goods/register}" class="btn btn_navy" title="등록">등록</a>
+					</div>
+				</div>
+				<!--/* //.pd_list */-->
+
+				<!--/* common.html의 paging fragment */-->
+				<div th:replace="fragments/common :: paging"></div>
+			</div>
+			<!--/* //.inner */-->
+		</div>
+		<!--/* //.contents */-->
+	</th:block>
+
+	<th:block layout:fragment="script">
+		<script th:inline="javascript">
+		/* <![CDATA[ */
+
+			/**
+			 * 상품 목록 Ajax 호출 결과 HTML을 화면에 렌더링
+			 */
+			function printGoodsListHtml(uri) {
+
+				/*[- Ajax 호출 -]*/
+				$.get(uri + "&isAjax=true", function(response) {
+					$("#paging").html(response);
+
+					/*[- 비동기 처리에서 도메인(주소) 변경 -]*/
+					if (isPushStateAvailable() == true) {
+						history.pushState(null, null, uri); /*[- state, title, uri -]*/
+					}
+				}, "html");
+
+				return false;
+			}
+			/*[- end of function -]*/
+
+
+			/**
+			 * 출력 데이터 수 변경
+			 */
+			function changeRecordCounrPerPage(obj) {
+
+				/*[- 파라미터 쿼리 스트링 -]*/
+				var queryString = /*[[ ${params.paginationInfo.makeQueryString(1)} ]]*/;
+				/*[- 쿼리 스트링에서 특정 파라미터 값 설정에 사용하는 인스턴스 -]*/
+				queryString = new URLSearchParams(queryString);
+				queryString.set("recordCountPerPage", obj.value);
+
+				/*[- 검색 유형, 검색 키워드를 포함한 Request URI -]*/
+				var uri = obj.form.action + "?" + queryString;
+				uri += "&searchKeyword=" + obj.form.searchKeyword.value;
+
+				printGoodsListHtml(uri);
+			}
+			/*[- end of function -]*/
+
+
+		/* ]]> */
+		</script>
+	</th:block>
+
+</html>

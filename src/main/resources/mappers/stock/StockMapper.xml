@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.dy.store.stock.mapper.StockMapper">
+
+	<!-- stock 테이블 전체 컬럼 -->
+	<sql id="stockColumns">
+		  id
+		, code
+		, color
+		, options
+		, delete_yn
+		, created_date
+		, modified_date
+	</sql>
+
+	<!-- 상품 재고 등록 -->
+	<insert id="insertStock" parameterType="StockDto">
+		INSERT INTO stock (
+			<include refid="stockColumns" />
+		) VALUES (
+			  #{id}
+			, #{code}
+			, #{color}
+			, #{options}
+			, 'N'
+			, NOW()
+			, NULL
+		)
+	</insert>
+
+	<!-- 상품 재고 정보 조회 -->
+	<select id="selectStockDetail" parameterType="string" resultType="StockDto">
+		SELECT
+			<include refid="stockColumns" />
+		FROM
+			stock
+		<where>
+			delete_yn = 'N'
+		AND
+			code = #{code}
+		</where>
+	</select>
+
+	<!-- 상품 재고 수정 -->
+	<update id="updateStock" parameterType="StockDto">
+		UPDATE stock
+		SET
+			  modified_date = NOW()
+		<if test="@com.dy.store.common.util.MyBatisUtils@isEmpty( color ) == false">
+			, color = #{color}
+		</if>
+		<if test="@com.dy.store.common.util.MyBatisUtils@isEmpty( options ) == false">
+			, options = #{options}
+		</if>
+		WHERE
+			code = #{code}
+	</update>
+
+</mapper>

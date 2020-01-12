@@ -17,6 +17,42 @@
 		, last_login_date
 	</sql>
 
+	<!-- user 테이블 검색 -->
+	<sql id="search">
+		<!-- 검색 키워드가 존재하지 않으면 쿼리 실행 X -->
+		<if test="@com.dy.store.common.util.MyBatisUtils@isEmpty( searchKeyword ) == false">
+			<choose>
+				<!-- 검색 유형이 존재할 때 -->
+				<when test="@com.dy.store.common.util.MyBatisUtils@isEmpty( searchType ) == false">
+					<!-- 검색 유형을 #{}으로 처리하면 따옴표가 붙게 되는데, ${}으로 처리하면 따옴표는 제거되지만, SQL Injection 공격을 받을 수 있음 -->
+					<choose>
+						<when test='searchType.userSearchType.name() == "EMAIL"'>
+							AND
+								EMAIL LIKE CONCAT('%', REPLACE(#{searchKeyword}, ' ', ''), '%')
+						</when>
+						<when test='searchType.userSearchType.name() == "NICKNAME"'>
+							AND
+								NICKNAME LIKE CONCAT('%', REPLACE(#{searchKeyword}, ' ', ''), '%')
+						</when>
+						<when test='searchType.userSearchType.name() == "BIRTHDAY"'>
+							AND
+								BIRTHDAY LIKE CONCAT('%', REPLACE(#{searchKeyword}, ' ', ''), '%')
+						</when>
+					</choose>
+				</when>
+				<!-- 검색 유형이 존재하지 않을 때 -->
+				<otherwise>
+					AND
+						(
+							   REPLACE(email, ' ', '') LIKE CONCAT('%', REPLACE(#{searchKeyword}, ' ', ''), '%')
+							OR REPLACE(nickname, ' ', '') LIKE CONCAT('%', REPLACE(#{searchKeyword}, ' ', ''), '%')
+							OR REPLACE(birthday, ' ', '') LIKE CONCAT('%', REPLACE(#{searchKeyword}, ' ', ''), '%')
+						)
+				</otherwise>
+			</choose>
+		</if>
+	</sql>
+
 	<!-- 사용자 등록 -->
 	<insert id="insertUser" parameterType="UserDto">
 		INSERT INTO user (
@@ -109,7 +145,7 @@
 			user
 		<where>
 			delete_yn = 'N'
-			<include refid="CommonMapper.search" />
+			<include refid="search" />
 		</where>
 		ORDER BY
 			  id DESC, created_date DESC
@@ -140,7 +176,7 @@
 					)
 				</when>
 			</choose>
-			<include refid="CommonMapper.search" />
+			<include refid="search" />
 		</where>
 	</select>
 

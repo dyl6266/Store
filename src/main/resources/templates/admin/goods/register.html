@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layout/admin/basic">
+
+	<th:block layout:fragment="add-resource">
+		<!--/* CKEditor CDN */-->
+		<script src="https://cdn.ckeditor.com/4.12.1/standard/ckeditor.js"></script>
+	</th:block>
+
+	<th:block layout:fragment="content">
+		<div class="contents">
+			<div class="page_route">
+				<a href="#" class="home" title="Home">Home</a>
+				<a href="#" title="상품 관리">상품 관리</a>
+				<a href="#" title="상품 등록">상품 등록</a>
+			</div>
+
+			<div class="inner">
+				<h1 class="page_title">상품 등록</h1>
+
+				<div class="form_write pd_regi">
+					<form th:action="@{/goods}" th:object="${goods}" method="post" onsubmit="return registerGoods(this)">
+						<!--/* 상품 정보 수정에 사용되는 파라미터 */-->
+						<input type="hidden" th:field="*{code}" />
+						<table>
+							<caption></caption>
+							<colgroup>
+								<col style="width: 180px;" />
+								<col style="*" />
+							</colgroup>
+							<tbody>
+								<tr>
+									<th>판매 상태</th>
+									<td>
+										<select th:field=*{status} style="min-width: 120px;" onchange="changeStatus(this.value)">
+											<option th:each="status : ${T(com.dy.store.goods.constant.Status).values()}" th:value="${status}" th:text="${status.value}" th:selected="${#strings.equals( status, goods.status )}"></option>
+										</select>
+									</td>
+								</tr>
+								<!--/* 할인 상품인 경우에만 필드 노출 */-->
+								<tr id="rateTr" th:styleappend="${not #strings.equals( goods.status, 'DISCOUNT' )} ? 'display: none;'">
+									<th>할인율 (%)</th>
+									<td>
+										<input type="text" th:field="*{rate}" class="type2" maxlength="2" />
+									</td>
+								</tr>
+								<tr>
+									<th>상품명</th>
+									<td>
+										<input type="text" th:field="*{name}" class="type2" />
+									</td>
+								</tr>
+								<tr>
+									<th>가격</th>
+									<td>
+										<input type="text" th:field="*{price}" class="type2" />
+									</td>
+								</tr>
+								<tr>
+									<th>색상</th>
+									<td>
+										<input type="text" th:field="*{stock.color}" id="color" class="type2" />
+									</td>
+								</tr>
+								<tr>
+									<th>사이즈</th>
+									<td>
+										<div class="table_wrap">
+											<ul class="thead">
+												<li th:each="seq : ${#numbers.sequence( 1, 4, 1 )}">
+													<span>사이즈</span>
+													<span class="type1">재고</span>
+												</li>
+											</ul>
+											<!--/* 상품 등록의 경우 */-->
+											<ul th:if="${#arrays.isEmpty( options )}" class="tbody">
+												<li th:each="size : ${#numbers.sequence( 220, 315, 5 )}">
+													<span th:text="${size}"></span>
+													<input type="text" name="quantity" value="0" />
+												</li>
+											</ul>
+											<!--/* 상품 수정의 경우 */-->
+											<ul th:unless="${#arrays.isEmpty( options )}" class="tbody">
+												<li th:each="size : ${options.keySet()}">
+													<span th:text="${size}"></span>
+													<!--/* 재고 수량을 입력하지 않은 상태로 null 값을 가지는 사이즈의 재고를 0으로 replace */-->
+													<input type="text" name="quantity" th:value="${not #strings.equals( options.get(size), 'null' ) ? options.get(size) : 0}" />
+												</li>
+											</ul>
+										</div>
+									</td>
+								</tr>
+								<tr>
+									<th>설명</th>
+									<td>
+										<div class="pd30 bg_lightgray">
+											<textarea th:field="*{description}"></textarea>
+							                <!-- <script>
+												CKEDITOR.replace('description', {
+													filebrowserImageUploadUrl: '/undefined',
+													removeDialogTabs: 'link:target;link:advanced;image:advanced;image:Link'
+										        });
+							                </script> -->
+										</div>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+
+						<div class="btn_wrap text_right">
+							<a th:href="@{/admin/goods/list}" class="btn btn_lightgray">취소</a>
+							<input type="submit" value="등록" class="btn btn_navy" />
+						</div>
+					</form>
+				</div>
+				<!--/* //.form_write */-->
+			</div>
+			<!--/* //.inner */-->
+		</div>
+		<!--/* //.contents */-->
+	</th:block>
+
+	<th:block layout:fragment="script">
+		<script th:inline="javascript">
+		/* <![CDATA[ */
+
+			/**
+			 * 판매 상태 변경
+			 */
+			function changeStatus(status) {
+
+				if (status == "DISCOUNT") {
+					document.getElementById("rateTr").style.display = "table-row";
+				} else {
+					document.getElementById("rateTr").style.display = "none";
+				}
+			}
+			/*[- end of function -]*/
+
+
+			/**
+			 * 상품 등록
+			 */
+			function registerGoods(form) {
+
+				/*[- 전체 필드 유효성 검증 -]*/
+				var isValidated = (
+						   isValid(form.name, "상품명", null)
+						&& isValid(form.price, "가격", null)
+						&& isValid(document.getElementById("color"), "색상", null)
+						&& isValid(form.description, "설명", null)
+				);
+				if (isValidated == false) {
+					return false;
+				}
+
+				/*[- 사이즈, 수량을 key : value 형태로 담는 오브젝트 -]*/
+				var options = new Object();
+				$(".tbody > li").each(function(idx, obj) {
+					var size = $(obj).children("span").text();
+					var quantity = $(obj).children("input").val();
+					options[String(size)] = parseInt(quantity);
+				});
+
+				/*[- 서버로 전달할 FormData -]*/
+				var formData = new FormData(form);
+				formData.append("stock.options", JSON.stringify(options));
+
+				/*[- 상품 등록 & 수정 Request URI, Method 처리 -]*/
+				var uri = (isEmpty(form.code.value) == true) ? form.action : form.action + "/" + form.code.value;
+				var method = (isEmpty(form.code.value) == true) ? "post" : "patch";
+				/*[- formData.append("_method", type); => form에 hidden으로 추가해도 됨 -]*/
+
+				$.ajax({
+					url : uri,
+					type : method,
+					headers : getHeaders(method, false),
+					dataType : "json",
+					data : formData,
+					contentType : false,
+					processData : false, /*[- 데이터를 일반적인 Query String으로 변환할 것인지를 결정하는 속성으로 기본값으로 true를 가짐 -]*/
+					async : false,
+					success : function(response) {
+						if (isEmpty(response.message) == false) {
+							alert(response.message);
+							return false;
+						}
+						alert("상품 등록이 완료되었습니다.");
+						location.href = /*[[ @{/admin/goods/list} ]]*/;
+					},
+					error : function(request, status, error) {
+						alert("오류가 발생하였습니다.");
+					}
+				});
+
+				return false;
+			}
+
+		/* ]]> */
+		</script>
+	</th:block>
+
+</html>
