@@ -54,8 +54,7 @@ public class GoodsDto extends CommonDto {
 	private StockDto stock;
 
 	@Builder
-	public GoodsDto(Long id, String code, String name, String description, Integer price, Integer rate, Status status,
-			StockDto stock) {
+	public GoodsDto(Long id, String code, String name, String description, Integer price, Integer rate, Status status, StockDto stock) {
 		this.id = id;
 		this.code = code;
 		this.name = name;

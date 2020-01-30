@@ -5,8 +5,13 @@ import java.util.List;
 
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.dy.store.attach.domain.AttachDto;
+import com.dy.store.attach.mapper.AttachMapper;
 import com.dy.store.common.paging.PaginationInfo;
+import com.dy.store.common.util.AttachUtils;
 import com.dy.store.goods.domain.GoodsDto;
 import com.dy.store.goods.mapper.GoodsMapper;
 import com.dy.store.stock.domain.StockDto;
@@ -22,6 +27,8 @@ public class GoodsServiceImpl implements GoodsService {
 
 	private StockMapper stockMapper;
 
+	private AttachMapper attachMapper;
+
 	/**
 	 * 상품 등록 (Insert or Update)
 	 * 
@@ -35,7 +42,7 @@ public class GoodsServiceImpl implements GoodsService {
 
 		/* Insert (파라미터에 PK가 존재하지 않는 경우) */
 		if (Strings.isBlank(params.getCode()) == true) {
-			/* 상품 등록 */
+			/* 상품 정보 등록 */
 			queryResult = goodsMapper.insertGoods(params);
 			if (queryResult != 1) {
 				return false;
@@ -49,7 +56,7 @@ public class GoodsServiceImpl implements GoodsService {
 				return false;
 			}
 
-		/* Update (파라미터에 PK가 존재하는 경우) */
+			/* Update (파라미터에 PK가 존재하는 경우) */
 		} else {
 			/* 상품 수정 */
 			queryResult = goodsMapper.updateGoods(params);
@@ -63,6 +70,40 @@ public class GoodsServiceImpl implements GoodsService {
 			if (queryResult != 1) {
 				return false;
 			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * 상품 등록 (Insert or Update)
+	 * 
+	 * @param params - GoodsDto
+	 * @param files - 상품 이미지 파일
+	 * @return boolean
+	 */
+	@Override
+	public boolean registerGoods(GoodsDto params, MultipartFile[] files) {
+
+		boolean isRegistered = registerGoods(params);
+		if (isRegistered == false) {
+			return false;
+		}
+
+		/* 파일 업로드 */
+		List<AttachDto> attachList = AttachUtils.uploadFiles(files, params.getCode());
+		if (CollectionUtils.isEmpty(attachList) == true) {
+			return false;
+		}
+
+		int queryResult = 0;
+
+		/* 이미지 정보 등록 */
+		for (AttachDto attach : attachList) {
+			queryResult += attachMapper.insertAttach(attach);
+		}
+		if (queryResult < 1) {
+			return false;
 		}
 
 		return true;

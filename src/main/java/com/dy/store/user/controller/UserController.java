@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -73,6 +74,12 @@ public class UserController {
 
 		List<UserDto> userList = userService.getUserList(params);
 		model.addAttribute("users", userList);
+		
+		if (ObjectUtils.isEmpty(params.getSearchType()) == false) {
+			System.out.println("#########");
+			System.out.println(params.getSearchType().getValue());
+			System.out.println(params.toString());
+		}
 
 		return (isAjax == false) ? "admin/user/list" : "admin/user/list-ajax";
 	}

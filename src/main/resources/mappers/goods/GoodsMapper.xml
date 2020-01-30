@@ -59,22 +59,22 @@
 	<update id="updateGoods" parameterType="GoodsDto">
 		UPDATE goods
 		SET
-			modified_date = NOW()
-			<if test="@com.dy.store.common.util.MyBatisUtils@isEmpty( name ) == false">
+			  modified_date = NOW()
+		<if test="@com.dy.store.common.util.MyBatisUtils@isEmpty( name ) == false">
 			, name = #{name}
-			</if>
-			<if test="@com.dy.store.common.util.MyBatisUtils@isEmpty( description ) == false">
+		</if>
+		<if test="@com.dy.store.common.util.MyBatisUtils@isEmpty( description ) == false">
 			, description = #{description}
-			</if>
-			<if test="@com.dy.store.common.util.MyBatisUtils@isEmpty( price ) == false">
+		</if>
+		<if test="@com.dy.store.common.util.MyBatisUtils@isEmpty( price ) == false">
 			, price = #{price}
 			</if>
-			<if test="@com.dy.store.common.util.MyBatisUtils@isEmpty( rate ) == false">
+		<if test="@com.dy.store.common.util.MyBatisUtils@isEmpty( rate ) == false">
 			, rate = #{rate}
-			</if>
-			<if test="@com.dy.store.common.util.MyBatisUtils@isEmpty( status ) == false">
+		</if>
+		<if test="@com.dy.store.common.util.MyBatisUtils@isEmpty( status ) == false">
 			, status = #{status}
-			</if>
+		</if>
 		WHERE
 			code = #{code}
 	</update>

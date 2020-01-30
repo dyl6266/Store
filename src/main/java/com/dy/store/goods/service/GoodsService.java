@@ -2,6 +2,8 @@ package com.dy.store.goods.service;
 
 import java.util.List;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import com.dy.store.goods.domain.GoodsDto;
 
 public interface GoodsService {
@@ -13,6 +15,15 @@ public interface GoodsService {
 	 * @return boolean
 	 */
 	public boolean registerGoods(GoodsDto params);
+
+	/**
+	 * 상품 등록 (Insert or Update)
+	 * 
+	 * @param params - GoodsDto
+	 * @param files - 상품 이미지 파일
+	 * @return boolean
+	 */
+	public boolean registerGoods(GoodsDto params, MultipartFile[] files);
 
 	/**
 	 * 상품 정보 조회

@@ -7,7 +7,7 @@ import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
-public enum UserSearchType implements Types {
+public enum UserType implements Types {
 
 	/** 사용자 검색 유형 */
 	EMAIL("아이디"), NICKNAME("닉네임"), BIRTHDAY("생년월일");

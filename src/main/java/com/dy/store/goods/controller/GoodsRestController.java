@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.dy.store.goods.domain.GoodsDto;
 import com.dy.store.goods.service.GoodsService;
@@ -25,11 +26,12 @@ public class GoodsRestController {
 	 * 관리자 상품 등록
 	 * 
 	 * @param params - GoodsDto
+	 * @param files - 상품 이미지 파일
 	 * @param bindingResult - 빈 유효성 검증 오브젝트
 	 * @return 메시지, 결과를 담은 Json
 	 */
 	@PostMapping(value = "/goods")
-	public JsonObject registerGoods(@Valid GoodsDto params, BindingResult bindingResult) {
+	public JsonObject registerGoods(@Valid GoodsDto params, BindingResult bindingResult, MultipartFile[] files) {
 
 		JsonObject jsonObj = new JsonObject();
 
@@ -44,10 +46,17 @@ public class GoodsRestController {
 			}
 			jsonObj.addProperty("result", false);
 			return jsonObj;
+
+		/* 파일이 존재하지 않는 경우 (HTML의 Input 엘러먼트의 영향으로 files의 0번째 인덱스는 항상 존재) */
+		} else if (files[0].getSize() == 0) {
+			jsonObj.addProperty("message", "상품의 이미지를 등록해 주세요.");
+			jsonObj.addProperty("result", false);
+			return jsonObj;
 		}
 
+		/* 상품, 이미지 등록 */
 		try {
-			boolean isRegistered = goodsService.registerGoods(params);
+			boolean isRegistered = goodsService.registerGoods(params, files);
 			if (isRegistered == false) {
 				jsonObj.addProperty("message", "상품 등록에 실패하였습니다.");
 			}

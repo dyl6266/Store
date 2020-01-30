@@ -170,14 +170,52 @@ function getHeaders(method) {
 }
 
 /**
+ * Ajax 호출에 필요한 헤더 반환
+ * 
+ * @param method - HTTP 요청 메소드
+ * @param contentType - Content-Type 포함 여부 (FormData 등을 사용하면 다른 Content-Type을 사용)
+ * @returns Headers
+ */
+function getHeaders(method, contentType) {
+
+	var headers = new Object();
+	headers["X-HTTP-Method-Override"] = method;
+	headers["X-CSRF-TOKEN"] = getToken();
+
+	if (contentType == true) {
+		headers["Content-Type"] = "application/json";
+	}
+
+	return headers;
+}
+
+/**
  * 페이징 결과 HTML 반환
  * 
  * @param uri - 요청 URI
  * @param queryString - 파라미터 쿼리 스트링
+ * @param searchType - 검색 유형
  * @param element - html() 함수를 적용할 엘러먼트
  * @returns 페이징 결과 HTML
  */
-function movePage(uri, queryString, element) {
+function movePage(uri, queryString, searchType, element) {
+
+	/* 쿼리 스트링에서 특정 파라미터 값 설정에 사용하는 인스턴스 */
+	queryString = new URLSearchParams(queryString);
+	/* searchType 쿼리 스트링 제거 */
+	queryString.delete("searchType");
+	/* URLSearchParams 생성자는 "?"를 제거하기 때문에 추가해야 함 */
+	queryString = "?" + queryString;
+
+	if (isEmpty(searchType) == false) {
+		/* 파라미터로 들어온 searchType을 순환하여 key에 해당하는 value가 존재하면 쿼리 스트링에 추가 */
+		for (var type of Object.keys(searchType)) {
+			if (isEmpty(searchType[type]) == false) {
+				queryString.append("searchType." + type, searchType[type]);
+				break;
+			}
+		}
+	}
 
 	/* 검색 유형, 검색 키워드, Ajax 요청 여부를 포함한 요청 URI */
 	var requestUri = uri + queryString + "&isAjax=true";

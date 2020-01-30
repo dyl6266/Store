@@ -3,11 +3,11 @@
 
 	<!--/* 사용자, 관리자 공통 페이징 */-->
 	<div th:fragment="paging" th:if="${params != null and params.paginationInfo.criteria.totalRecordCount > 0}" th:object="${params.paginationInfo}" th:with="info=${params.paginationInfo}" class="paging">
-		<a href="javascript: void(0)" class="btn_prev_db" th:onclick="movePage([[ ${#request.requestURI} ]], [[ ${info.makeSearchQueryString( 1 )} ]], document.getElementById('paging'))">처음</a>
-		<a href="javascript: void(0)" th:if="*{hasPreviousPage == true}" class="btn_prev" th:onclick="movePage([[ ${#request.requestURI} ]], [[ ${info.makeSearchQueryString( info.firstPage - 1 )} ]], document.getElementById('paging'))">이전</a>
-		<a href="javascript: void(0)" th:each="pageNo : *{#numbers.sequence( firstPage, lastPage )}" th:text="${pageNo}" th:class="${pageNo == params.currentPageNo} ? 'active'" th:onclick="movePage([[ ${#request.requestURI} ]], [[ ${info.makeSearchQueryString(pageNo)} ]], document.getElementById('paging'))"></a>
-		<a href="javascript: void(0)" th:if="*{hasNextPage == true}" class="btn_next" th:onclick="movePage([[ ${#request.requestURI} ]], [[ ${info.makeSearchQueryString( info.lastPage + 1 )} ]], document.getElementById('paging'))">다음</a>
-		<a href="javascript: void(0)" class="btn_next_db" th:onclick="movePage([[ ${#request.requestURI} ]], [[ ${info.makeSearchQueryString( info.totalPageCount )} ]], document.getElementById('paging'))">마지막</a>
+		<a href="javascript: void(0)" class="btn_prev_db" th:onclick="movePage([[ ${#request.requestURI} ]], [[ ${info.makeSearchQueryString( 1 )} ]], [[ ${params.searchType} ]], document.getElementById('paging'))">처음</a>
+		<a href="javascript: void(0)" th:if="*{hasPreviousPage == true}" class="btn_prev" th:onclick="movePage([[ ${#request.requestURI} ]], [[ ${info.makeSearchQueryString( info.firstPage - 1 )} ]], [[ ${params.searchType} ]], document.getElementById('paging'))">이전</a>
+		<a href="javascript: void(0)" th:each="pageNo : *{#numbers.sequence( firstPage, lastPage )}" th:text="${pageNo}" th:class="${pageNo == params.currentPageNo} ? 'active'" th:onclick="movePage([[ ${#request.requestURI} ]], [[ ${info.makeSearchQueryString(pageNo)} ]], [[ ${params.searchType} ]], document.getElementById('paging'))"></a>
+		<a href="javascript: void(0)" th:if="*{hasNextPage == true}" class="btn_next" th:onclick="movePage([[ ${#request.requestURI} ]], [[ ${info.makeSearchQueryString( info.lastPage + 1 )} ]], [[ ${params.searchType} ]], document.getElementById('paging'))">다음</a>
+		<a href="javascript: void(0)" class="btn_next_db" th:onclick="movePage([[ ${#request.requestURI} ]], [[ ${info.makeSearchQueryString( info.totalPageCount )} ]], [[ ${params.searchType} ]], document.getElementById('paging'))">마지막</a>
 	</div>
 
 </html>

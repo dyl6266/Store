@@ -103,6 +103,27 @@
 										</div>
 									</td>
 								</tr>
+								<tr>
+									<th>이미지</th>
+									<td>
+										<div class="file_box">
+											<input type="text" id="file0" class="wd300" readonly />
+											<label class="btn">
+												파일 선택
+												<input type="file" name="files" onchange="document.getElementById('file0').value = this.value" />
+											</label>
+											<button type="button" class="btn btn_navy" onclick="addFile(this)">+ 추가</button>
+										</div>
+										<br />
+										<!--/* 첨부 파일 목록 */-->
+										<ul th:if="${not #lists.isEmpty( files )}" class="file_list">
+											<li th:each="row, status : ${files}">
+												<p th:text="${row.originalName}"></p>
+												<button type="button" class="btn_delete" th:onclick="deleteFile([[ ${row.idx} ]], [[ ${row.originalName} ]], this)">삭제</button>
+											</li>
+										</ul>
+									</td>
+								</tr>
 							</tbody>
 						</table>
 
@@ -191,9 +212,49 @@
 						alert("오류가 발생하였습니다.");
 					}
 				});
+				/*[- end of ajax -]*/
 
 				return false;
 			}
+			/*[- end of function -]*/
+
+
+			/*[- files의 id에 파읾명을 지정하기 위한 인덱스 -]*/
+			var idx = 0;
+
+			/**
+			 * 파일 Input 엘러먼트 추가
+			 */
+			function addFile(obj) {
+				
+				var test = $(".file_box").last();
+				var test2 = $(".file_box").children().first().val();
+				console.log(test);
+				console.log(test2);
+				return false;
+
+				/*[- 이전에 존재하는 Input에 파일이 추가되지 않으면 중지 -]*/
+				var filename = $(".file_box").last().children("input").val();
+				if (isEmpty(filename) == true) {
+					alert("이전 필드에 먼저 이미지를 추가해 주세요.");
+					return false;
+				}
+
+				/*[- Input 엘러먼트 추가 -]*/
+				var html = "";
+				html += '<div class="file_box">';
+					html += '<input type="text" id="file'+ (++idx) +'" class="wd300" readonly />';
+					html += '<label class="btn">';
+						html += '파일 선택';
+						html += '<input type="file" name="files" onchange="document.getElementById(\'file'+ idx +'\').value = this.value" />';
+					html += '</label>';
+					html += '<button type="button" class="btn btn_navy" onclick="removeFile(this)">- 삭제</button>';
+				html += '</div>';
+				html += '<br />';
+
+				$(".file_box").last().next().after(html);
+			}
+
 
 		/* ]]> */
 		</script>

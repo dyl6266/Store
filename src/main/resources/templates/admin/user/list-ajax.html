@@ -17,7 +17,7 @@
 					<dd>
 						<select name="searchType">
 							<option value="">=======</option>
-							<option th:each="type : ${T(com.dy.store.common.paging.constant.UserSearchType).values()}" th:value="${type}" th:text="${type.value}" th:selected="${params.searchType != null and #strings.equals(type, params.searchType)}"></option>
+							<option th:each="type : ${T(com.dy.store.common.paging.constant.UserType).values()}" th:value="${type}" th:text="${type.value}" th:selected="${params.searchType != null and #strings.equals(type, params.searchType)}"></option>
 						</select>
 					</dd>
 				</dl>

@@ -2,6 +2,7 @@ package com.dy.store;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.web.servlet.MultipartAutoConfiguration;
 
 /*
  * @SpringBootApplication => 스프링 부트에서 다양한 기능을 하는 핵심 애너테이션 (세 개의 애너테이션으로 구성)
@@ -11,7 +12,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @Configuration => SpringBootConfiguration이라는 애너테이션에 포함된 것으로 해당 애너테이션이 붙은 클래스를 자바 기반의 설정 파일로 지정
  * 
  */
-@SpringBootApplication
+@SpringBootApplication(exclude = { MultipartAutoConfiguration.class }) /* 첨부 파일 관련 자동 구성 요소 사용 제외 */
 public class StoreApplication {
 
 	/*
